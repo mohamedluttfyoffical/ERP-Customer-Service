@@ -1,0 +1,1960 @@
+// =============================================================================
+// Sanad ERP — Multi-tenant support & field-service platform
+// Phase 1 database contract
+//
+// Tenancy invariants:
+//   1. Every tenant-owned table carries an explicit `tenantId` column.
+//   2. Every tenant-owned query MUST include `tenantId` (enforced in Phase 2 by
+//      the tenant-scoped repository/Prisma extension).
+//   3. Tenant-owned business identifiers are unique per tenant, never globally.
+//   4. Platform-owned tables (plans, webhooks, system settings, identities) are
+//      intentionally not tenant-scoped.
+// =============================================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// =============================================================================
+// Enums
+// =============================================================================
+
+enum Locale {
+  AR
+  EN
+}
+
+enum PlatformRole {
+  USER
+  SUPER_ADMIN
+}
+
+enum TenantStatus {
+  PROVISIONING
+  TRIALING
+  ACTIVE
+  PAST_DUE
+  SUSPENDED
+  CANCELED
+}
+
+enum DomainVerificationStatus {
+  PENDING
+  VERIFIED
+  FAILED
+}
+
+enum RoleKey {
+  OWNER
+  ADMIN
+  AGENT
+  TECHNICIAN
+  BILLING
+  CUSTOM
+}
+
+enum MembershipStatus {
+  INVITED
+  ACTIVE
+  SUSPENDED
+  REMOVED
+}
+
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  EXPIRED
+  REVOKED
+}
+
+enum BillingInterval {
+  MONTHLY
+  ANNUAL
+}
+
+enum PlanStatus {
+  DRAFT
+  ACTIVE
+  ARCHIVED
+}
+
+enum UsageMetric {
+  AGENTS
+  TICKETS_PER_MONTH
+  STORAGE_MB
+  DEPARTMENTS
+  KNOWLEDGE_BASE_ARTICLES
+  MONTHLY_ACTIVE_CUSTOMERS
+}
+
+enum SubscriptionStatus {
+  TRIALING
+  ACTIVE
+  PAST_DUE
+  PAUSED
+  CANCELED
+  UNPAID
+  INCOMPLETE
+  INCOMPLETE_EXPIRED
+}
+
+enum BillingProvider {
+  STRIPE
+  PAYMOB
+  FAWRY
+  MANUAL
+}
+
+enum SubscriptionInvoiceStatus {
+  DRAFT
+  OPEN
+  PAID
+  VOID
+  UNCOLLECTIBLE
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCEEDED
+  FAILED
+  REFUNDED
+  PARTIALLY_REFUNDED
+}
+
+enum WebhookEventStatus {
+  RECEIVED
+  PROCESSING
+  PROCESSED
+  FAILED
+  SKIPPED
+}
+
+enum CustomerType {
+  COMPANY
+  INDIVIDUAL
+}
+
+enum CustomerStatus {
+  ACTIVE
+  INACTIVE
+  PROSPECT
+  CHURNED
+}
+
+enum ContractStatus {
+  DRAFT
+  ACTIVE
+  EXPIRED
+  TERMINATED
+}
+
+enum AssetStatus {
+  ACTIVE
+  UNDER_MAINTENANCE
+  OUT_OF_SERVICE
+  RETIRED
+}
+
+enum SalesOrderStatus {
+  DRAFT
+  CONFIRMED
+  FULFILLED
+  CANCELED
+}
+
+enum WorkOrderType {
+  INSTALLATION
+  PREVENTIVE_MAINTENANCE
+  CORRECTIVE_MAINTENANCE
+  INSPECTION
+  REPAIR
+}
+
+enum WorkOrderStatus {
+  DRAFT
+  SCHEDULED
+  IN_PROGRESS
+  ON_HOLD
+  COMPLETED
+  CANCELED
+}
+
+enum QuotationStatus {
+  DRAFT
+  SENT
+  ACCEPTED
+  REJECTED
+  EXPIRED
+  CANCELED
+  CONVERTED
+}
+
+enum SalesInvoiceStatus {
+  DRAFT
+  ISSUED
+  PARTIALLY_PAID
+  PAID
+  VOID
+  OVERDUE
+}
+
+enum SparePartRequestStatus {
+  REQUESTED
+  APPROVED
+  ORDERED
+  FULFILLED
+  REJECTED
+  CANCELED
+}
+
+enum TicketStatus {
+  OPEN
+  IN_PROGRESS
+  PENDING_CUSTOMER
+  ESCALATED
+  RESOLVED
+  CLOSED
+}
+
+enum TicketPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum TicketChannel {
+  PORTAL
+  EMAIL
+  CHAT
+  PHONE
+  WHATSAPP
+  API
+}
+
+enum TicketType {
+  QUESTION
+  INCIDENT
+  PROBLEM
+  FEATURE_REQUEST
+  BILLING
+  MAINTENANCE
+}
+
+enum MessageSenderType {
+  CUSTOMER
+  AGENT
+  SYSTEM
+  AUTOMATION
+}
+
+enum MessageVisibility {
+  PUBLIC
+  INTERNAL
+}
+
+enum SlaKind {
+  FIRST_RESPONSE
+  RESOLUTION
+}
+
+enum SlaState {
+  PENDING
+  MET
+  BREACHED
+}
+
+enum TicketActivityType {
+  CREATED
+  ASSIGNED
+  STATUS_CHANGED
+  PRIORITY_CHANGED
+  DEPARTMENT_CHANGED
+  SLA_BREACHED
+  ESCALATED
+  RESPONSE_SENT
+  INTERNAL_NOTE_ADDED
+  TAG_ADDED
+  ATTACHMENT_ADDED
+  CUSTOMER_REPLIED
+  REOPENED
+  RESOLVED
+  CLOSED
+  CSAT_RECEIVED
+  WORK_ORDER_CREATED
+}
+
+enum AttachmentScanStatus {
+  PENDING
+  CLEAN
+  INFECTED
+  FAILED
+}
+
+enum ChatSessionStatus {
+  WAITING
+  OPEN
+  ASSIGNED
+  CLOSED
+}
+
+enum KnowledgeStatus {
+  DRAFT
+  IN_REVIEW
+  PUBLISHED
+  ARCHIVED
+}
+
+enum NotificationType {
+  TICKET_ASSIGNED
+  TICKET_REPLY
+  CUSTOMER_REPLY
+  MENTION
+  SLA_WARNING
+  SLA_BREACH
+  BILLING
+  SYSTEM
+}
+
+enum AuditActorType {
+  USER
+  SYSTEM
+  API
+}
+
+enum CustomFieldType {
+  TEXT
+  TEXTAREA
+  NUMBER
+  DATE
+  BOOLEAN
+  SELECT
+  MULTI_SELECT
+}
+
+// =============================================================================
+// Identity & platform access (global, not tenant-owned)
+// =============================================================================
+
+model User {
+  id            String       @id @default(cuid())
+  email         String       @unique @db.VarChar(320)
+  emailVerified DateTime?
+  name          String?      @db.VarChar(200)
+  passwordHash  String?
+  image         String?
+  locale        Locale       @default(AR)
+  timezone      String       @default("Asia/Riyadh") @db.VarChar(64)
+  platformRole  PlatformRole @default(USER)
+  isActive      Boolean      @default(true)
+  lastLoginAt   DateTime?
+  failedLoginAttempts Int    @default(0)
+  lockedUntil   DateTime?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  accounts              Account[]
+  sessions              Session[]
+  memberships           Membership[]
+  customerContacts      CustomerContact[]
+  ticketMessages        TicketMessage[]     @relation("TicketMessageSender")
+  chatMessages          ChatMessage[]       @relation("ChatMessageSender")
+  attachments           Attachment[]        @relation("AttachmentUploader")
+  mentions              MessageMention[]    @relation("MentionedUser")
+  cannedResponses       CannedResponse[]    @relation("CannedResponseAuthor")
+  invitationsSent       TenantInvitation[]  @relation("InvitationInviter")
+  kbArticles            KbArticle[]         @relation("KbArticleAuthor")
+  kbFeedback            KbArticleFeedback[]
+  notifications         Notification[]
+  auditLogs             AuditLog[]
+  systemSettingsUpdated SystemSetting[]     @relation("SystemSettingUpdater")
+
+  @@index([platformRole, isActive])
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@index([expires])
+}
+
+model SystemSetting {
+  key             String   @id @db.VarChar(120)
+  value           Json
+  description     String?  @db.Text
+  updatedByUserId String?
+  updatedBy       User?    @relation("SystemSettingUpdater", fields: [updatedByUserId], references: [id], onDelete: SetNull)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([updatedByUserId])
+}
+
+// =============================================================================
+// SaaS plans (platform-owned catalogue)
+// =============================================================================
+
+model Plan {
+  id                    String     @id @default(cuid())
+  code                  String     @unique @db.VarChar(40)
+  nameAr                String     @db.VarChar(120)
+  nameEn                String     @db.VarChar(120)
+  descriptionAr         String?    @db.Text
+  descriptionEn         String?    @db.Text
+  status                PlanStatus @default(ACTIVE)
+  tier                  Int        @default(0)
+  trialDays             Int        @default(14)
+  annualDiscountPercent Decimal    @default(0) @db.Decimal(5, 2)
+  isPopular             Boolean    @default(false)
+  sortOrder             Int        @default(0)
+  createdAt             DateTime   @default(now())
+  updatedAt             DateTime   @updatedAt
+
+  prices        PlanPrice[]
+  features      PlanFeature[]
+  limits        PlanLimit[]
+  subscriptions Subscription[]
+
+  @@index([status, sortOrder])
+}
+
+model PlanPrice {
+  id                    String          @id @default(cuid())
+  planId                String
+  interval              BillingInterval
+  amount                Decimal         @db.Decimal(12, 2)
+  currency              String          @default("USD") @db.Char(3)
+  annualDiscountPercent Decimal?        @db.Decimal(5, 2)
+  stripePriceId         String?         @unique @db.VarChar(255)
+  isActive              Boolean         @default(true)
+  createdAt             DateTime        @default(now())
+  updatedAt             DateTime        @updatedAt
+  plan                  Plan            @relation(fields: [planId], references: [id], onDelete: Cascade)
+  subscriptions         Subscription[]
+
+  @@unique([planId, interval, currency])
+  @@index([planId, isActive])
+}
+
+model PlanFeature {
+  id          String  @id @default(cuid())
+  planId      String
+  featureKey  String  @db.VarChar(80)
+  nameAr      String  @db.VarChar(160)
+  nameEn      String  @db.VarChar(160)
+  description String? @db.Text
+  included    Boolean @default(true)
+  plan        Plan    @relation(fields: [planId], references: [id], onDelete: Cascade)
+
+  @@unique([planId, featureKey])
+  @@index([planId])
+}
+
+model PlanLimit {
+  id         String      @id @default(cuid())
+  planId     String
+  metric     UsageMetric
+  /// `null` means unlimited. Zero means the feature is disabled.
+  limitValue Int?
+  plan       Plan        @relation(fields: [planId], references: [id], onDelete: Cascade)
+
+  @@unique([planId, metric])
+  @@index([planId])
+}
+
+// =============================================================================
+// Tenancy, workspace, roles & teams
+// =============================================================================
+
+model Tenant {
+  id                  String       @id @default(cuid())
+  slug                String       @unique @db.VarChar(63)
+  name                String       @db.VarChar(200)
+  legalName           String?      @db.VarChar(250)
+  email               String       @db.VarChar(320)
+  phone               String?      @db.VarChar(32)
+  logoUrl             String?
+  status              TenantStatus @default(PROVISIONING)
+  defaultLocale       Locale       @default(AR)
+  timezone            String       @default("Asia/Riyadh") @db.VarChar(64)
+  currency            String       @default("USD") @db.Char(3)
+  countryCode         String?      @db.Char(2)
+  taxId               String?      @db.VarChar(80)
+  stripeCustomerId    String?      @unique @db.VarChar(255)
+  trialEndsAt         DateTime?
+  activatedAt         DateTime?
+  suspendedAt         DateTime?
+  canceledAt          DateTime?
+  deletionScheduledAt DateTime?
+  createdAt           DateTime     @default(now())
+  updatedAt           DateTime     @updatedAt
+
+  settings                 TenantSetting?
+  domains                  TenantDomain[]
+  roles                    Role[]
+  memberships              Membership[]
+  invitations              TenantInvitation[]
+  departments              Department[]
+  businessCalendars        BusinessCalendar[]
+  businessHours            BusinessHour[]
+  calendarHolidays         CalendarHoliday[]
+  slaPolicies              SlaPolicy[]
+  slaTargets               SlaTarget[]
+  sequences                Sequence[]
+  subscriptions            Subscription[]
+  subscriptionInvoices     SubscriptionInvoice[]
+  subscriptionInvoiceLines SubscriptionInvoiceLine[]
+  payments                 Payment[]
+  billingEvents            BillingEvent[]
+  usageRecords             UsageRecord[]
+  customers                Customer[]
+  customerContacts         CustomerContact[]
+  products                 Product[]
+  contracts                Contract[]
+  assets                   Asset[]
+  maintenancePlans         MaintenancePlan[]
+  salesOrders              SalesOrder[]
+  orderItems               OrderItem[]
+  workOrders               WorkOrder[]
+  quotations               Quotation[]
+  quotationItems           QuotationItem[]
+  salesInvoices            SalesInvoice[]
+  salesInvoiceItems        SalesInvoiceItem[]
+  salesPayments            SalesPayment[]
+  spareParts               SparePart[]
+  sparePartRequests        SparePartRequest[]
+  tickets                  Ticket[]
+  ticketMessages           TicketMessage[]
+  attachments              Attachment[]
+  tags                     Tag[]
+  ticketTags               TicketTag[]
+  customFieldDefinitions   CustomFieldDefinition[]
+  customFieldValues        CustomFieldValue[]
+  cannedResponses          CannedResponse[]
+  ticketActivities         TicketActivity[]
+  slaEvents                SlaEvent[]
+  csatResponses            CsatResponse[]
+  timeEntries              TimeEntry[]
+  chatSessions             ChatSession[]
+  chatMessages             ChatMessage[]
+  ticketAssets             TicketAsset[]
+  kbCategories             KbCategory[]
+  kbArticles               KbArticle[]
+  kbArticleFeedback        KbArticleFeedback[]
+  kbFaqs                   KbFaq[]
+  messageMentions          MessageMention[]
+  notifications            Notification[]
+  auditLogs                AuditLog[]
+
+  @@index([status, createdAt])
+  @@index([trialEndsAt])
+}
+
+model TenantSetting {
+  tenantId           String   @id
+  supportEmail       String?  @db.VarChar(320)
+  supportPhone       String?  @db.VarChar(32)
+  brandPrimaryColor  String?  @db.VarChar(20)
+  brandAccentColor   String?  @db.VarChar(20)
+  emailNotifications Boolean  @default(true)
+  inAppNotifications Boolean  @default(true)
+  slaWarningMinutes  Int      @default(60)
+  metadata           Json?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  tenant             Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+}
+
+model TenantDomain {
+  id                    String                   @id @default(cuid())
+  tenantId              String
+  domain                String                   @unique @db.VarChar(253)
+  status                DomainVerificationStatus @default(PENDING)
+  isPrimary             Boolean                  @default(false)
+  verificationTokenHash String?
+  verifiedAt            DateTime?
+  lastCheckedAt         DateTime?
+  createdAt             DateTime                 @default(now())
+  updatedAt             DateTime                 @updatedAt
+  tenant                Tenant                   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, status])
+}
+
+model Role {
+  id          String   @id @default(cuid())
+  tenantId    String
+  key         RoleKey  @default(CUSTOM)
+  slug        String   @db.VarChar(60)
+  name        String   @db.VarChar(120)
+  description String?  @db.Text
+  /// Permission keys such as `ticket:update`. Validated by the RBAC layer.
+  permissions String[] @default([])
+  isSystem    Boolean  @default(false)
+  isDefault   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  tenant      Tenant             @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  memberships Membership[]
+  invitations TenantInvitation[]
+
+  @@unique([tenantId, slug])
+  @@index([tenantId, key])
+}
+
+model Membership {
+  id           String           @id @default(cuid())
+  tenantId     String
+  userId       String
+  roleId       String
+  departmentId String?
+  title        String?          @db.VarChar(120)
+  status       MembershipStatus @default(INVITED)
+  isBillable   Boolean          @default(true)
+  invitedAt    DateTime         @default(now())
+  joinedAt     DateTime?
+  lastActiveAt DateTime?
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+
+  tenant             Tenant             @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user               User               @relation(fields: [userId], references: [id], onDelete: Restrict)
+  role               Role               @relation(fields: [roleId], references: [id], onDelete: Restrict)
+  department         Department?        @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+  assignedTickets    Ticket[]           @relation("TicketAssignee")
+  assignedWorkOrders WorkOrder[]        @relation("WorkOrderAssignee")
+  assignedChats      ChatSession[]      @relation("ChatAssignee")
+  ticketActivities   TicketActivity[]
+  sparePartRequests  SparePartRequest[]
+  timeEntries        TimeEntry[]
+  ownedCustomers     Customer[]         @relation("CustomerOwner")
+
+  @@unique([tenantId, userId])
+  @@index([tenantId, status])
+  @@index([roleId])
+  @@index([departmentId])
+}
+
+model TenantInvitation {
+  id              String           @id @default(cuid())
+  tenantId        String
+  email           String           @db.VarChar(320)
+  roleId          String
+  departmentId    String?
+  tokenHash       String           @unique
+  status          InvitationStatus @default(PENDING)
+  invitedByUserId String
+  expiresAt       DateTime
+  acceptedAt      DateTime?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  tenant     Tenant      @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  role       Role        @relation(fields: [roleId], references: [id], onDelete: Restrict)
+  department Department? @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+  invitedBy  User        @relation("InvitationInviter", fields: [invitedByUserId], references: [id], onDelete: Restrict)
+
+  @@index([tenantId, status])
+  @@index([tenantId, email])
+}
+
+model Department {
+  id                 String   @id @default(cuid())
+  tenantId           String
+  name               String   @db.VarChar(120)
+  slug               String   @db.VarChar(80)
+  description        String?  @db.Text
+  email              String?  @db.VarChar(320)
+  color              String?  @db.VarChar(20)
+  isDefault          Boolean  @default(false)
+  isActive           Boolean  @default(true)
+  parentId           String?
+  defaultSlaPolicyId String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  tenant                 Tenant                  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  parent                 Department?             @relation("DepartmentHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
+  children               Department[]            @relation("DepartmentHierarchy")
+  defaultSlaPolicy       SlaPolicy?              @relation("DepartmentDefaultSla", fields: [defaultSlaPolicyId], references: [id], onDelete: SetNull)
+  memberships            Membership[]
+  tickets                Ticket[]
+  invitations            TenantInvitation[]
+  customFieldDefinitions CustomFieldDefinition[]
+
+  @@unique([tenantId, slug])
+  @@index([tenantId, isActive])
+  @@index([defaultSlaPolicyId])
+}
+
+model Sequence {
+  id        String   @id @default(cuid())
+  tenantId  String
+  key       String   @db.VarChar(40)
+  value     Int      @default(0)
+  updatedAt DateTime @updatedAt
+  tenant    Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, key])
+}
+
+// =============================================================================
+// SLA configuration
+// =============================================================================
+
+model BusinessCalendar {
+  id        String   @id @default(cuid())
+  tenantId  String
+  name      String   @db.VarChar(120)
+  timezone  String   @default("Asia/Riyadh") @db.VarChar(64)
+  isDefault Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tenant      Tenant            @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  hours       BusinessHour[]
+  holidays    CalendarHoliday[]
+  slaPolicies SlaPolicy[]
+
+  @@unique([tenantId, name])
+  @@index([tenantId, isDefault])
+}
+
+model BusinessHour {
+  id          String   @id @default(cuid())
+  tenantId    String
+  calendarId  String
+  /// ISO day of week: 1 = Monday, 7 = Sunday.
+  dayOfWeek   Int
+  startMinute Int
+  endMinute   Int
+  isEnabled   Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  tenant   Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  calendar BusinessCalendar @relation(fields: [calendarId], references: [id], onDelete: Cascade)
+
+  @@unique([calendarId, dayOfWeek, startMinute])
+  @@index([tenantId, calendarId])
+}
+
+model CalendarHoliday {
+  id         String   @id @default(cuid())
+  tenantId   String
+  calendarId String
+  date       DateTime @db.Date
+  name       String   @db.VarChar(160)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  tenant   Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  calendar BusinessCalendar @relation(fields: [calendarId], references: [id], onDelete: Cascade)
+
+  @@unique([calendarId, date])
+  @@index([tenantId, calendarId])
+}
+
+model SlaPolicy {
+  id                     String   @id @default(cuid())
+  tenantId               String
+  name                   String   @db.VarChar(160)
+  description            String?  @db.Text
+  isDefault              Boolean  @default(false)
+  isActive               Boolean  @default(true)
+  businessCalendarId     String?
+  pauseOnPendingCustomer Boolean  @default(true)
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+
+  tenant                Tenant            @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  businessCalendar      BusinessCalendar? @relation(fields: [businessCalendarId], references: [id], onDelete: SetNull)
+  targets               SlaTarget[]
+  tickets               Ticket[]
+  contracts             Contract[]
+  defaultForDepartments Department[]      @relation("DepartmentDefaultSla")
+
+  @@unique([tenantId, name])
+  @@index([tenantId, isActive, isDefault])
+  @@index([businessCalendarId])
+}
+
+model SlaTarget {
+  id                   String         @id @default(cuid())
+  tenantId             String
+  slaPolicyId          String
+  priority             TicketPriority
+  firstResponseMinutes Int
+  resolutionMinutes    Int
+  createdAt            DateTime       @default(now())
+  updatedAt            DateTime       @updatedAt
+
+  tenant    Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  slaPolicy SlaPolicy @relation(fields: [slaPolicyId], references: [id], onDelete: Cascade)
+
+  @@unique([slaPolicyId, priority])
+  @@index([tenantId, slaPolicyId])
+}
+
+// =============================================================================
+// SaaS subscriptions, invoices, payments & quota usage
+// =============================================================================
+
+model Subscription {
+  id                     String             @id @default(cuid())
+  tenantId               String
+  planId                 String
+  planPriceId            String?
+  interval               BillingInterval
+  status                 SubscriptionStatus @default(TRIALING)
+  provider               BillingProvider    @default(STRIPE)
+  providerSubscriptionId String?            @unique @db.VarChar(255)
+  providerCustomerId     String?            @db.VarChar(255)
+  seats                  Int                @default(1)
+  unitAmount             Decimal            @db.Decimal(12, 2)
+  currency               String             @default("USD") @db.Char(3)
+  trialStart             DateTime?
+  trialEnd               DateTime?
+  startedAt              DateTime           @default(now())
+  currentPeriodStart     DateTime?
+  currentPeriodEnd       DateTime?
+  cancelAtPeriodEnd      Boolean            @default(false)
+  canceledAt             DateTime?
+  endedAt                DateTime?
+  cancellationReason     String?            @db.Text
+  createdAt              DateTime           @default(now())
+  updatedAt              DateTime           @updatedAt
+
+  tenant        Tenant                @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  plan          Plan                  @relation(fields: [planId], references: [id], onDelete: Restrict)
+  planPrice     PlanPrice?            @relation(fields: [planPriceId], references: [id], onDelete: SetNull)
+  invoices      SubscriptionInvoice[]
+  billingEvents BillingEvent[]
+  usageRecords  UsageRecord[]
+
+  @@index([tenantId, status])
+  @@index([status, currentPeriodEnd])
+  @@index([planId])
+}
+
+model SubscriptionInvoice {
+  id                String                    @id @default(cuid())
+  tenantId          String
+  subscriptionId    String
+  number            String                    @db.VarChar(40)
+  status            SubscriptionInvoiceStatus @default(DRAFT)
+  currency          String                    @default("USD") @db.Char(3)
+  subtotal          Decimal                   @db.Decimal(12, 2)
+  discountAmount    Decimal                   @default(0) @db.Decimal(12, 2)
+  taxAmount         Decimal                   @default(0) @db.Decimal(12, 2)
+  total             Decimal                   @db.Decimal(12, 2)
+  amountPaid        Decimal                   @default(0) @db.Decimal(12, 2)
+  amountDue         Decimal                   @default(0) @db.Decimal(12, 2)
+  periodStart       DateTime
+  periodEnd         DateTime
+  issuedAt          DateTime?
+  dueAt             DateTime?
+  paidAt            DateTime?
+  providerInvoiceId String?                   @unique @db.VarChar(255)
+  hostedInvoiceUrl  String?
+  pdfUrl            String?
+  failureCode       String?                   @db.VarChar(120)
+  failureMessage    String?                   @db.Text
+  createdAt         DateTime                  @default(now())
+  updatedAt         DateTime                  @updatedAt
+
+  tenant       Tenant                    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  subscription Subscription              @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  lines        SubscriptionInvoiceLine[]
+  payments     Payment[]
+
+  @@unique([tenantId, number])
+  @@index([tenantId, status, createdAt])
+  @@index([subscriptionId, periodStart])
+}
+
+model SubscriptionInvoiceLine {
+  id          String   @id @default(cuid())
+  tenantId    String
+  invoiceId   String
+  description String   @db.VarChar(500)
+  quantity    Int      @default(1)
+  unitAmount  Decimal  @db.Decimal(12, 2)
+  amount      Decimal  @db.Decimal(12, 2)
+  isProration Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  tenant  Tenant              @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  invoice SubscriptionInvoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, invoiceId])
+}
+
+model Payment {
+  id                String          @id @default(cuid())
+  tenantId          String
+  invoiceId         String
+  provider          BillingProvider
+  providerPaymentId String?         @unique @db.VarChar(255)
+  status            PaymentStatus   @default(PENDING)
+  amount            Decimal         @db.Decimal(12, 2)
+  currency          String          @default("USD") @db.Char(3)
+  feeAmount         Decimal?        @db.Decimal(12, 2)
+  methodBrand       String?         @db.VarChar(40)
+  methodLast4       String?         @db.Char(4)
+  failureCode       String?         @db.VarChar(120)
+  failureMessage    String?         @db.Text
+  paidAt            DateTime?
+  refundedAmount    Decimal         @default(0) @db.Decimal(12, 2)
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  tenant  Tenant              @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  invoice SubscriptionInvoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, status, createdAt])
+  @@index([invoiceId])
+}
+
+model BillingEvent {
+  id              String          @id @default(cuid())
+  tenantId        String
+  subscriptionId  String?
+  type            String          @db.VarChar(120)
+  provider        BillingProvider
+  providerEventId String?         @db.VarChar(255)
+  payload         Json?
+  occurredAt      DateTime        @default(now())
+  createdAt       DateTime        @default(now())
+
+  tenant       Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  subscription Subscription? @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
+
+  @@index([tenantId, createdAt])
+  @@index([provider, providerEventId])
+}
+
+model UsageRecord {
+  id             String      @id @default(cuid())
+  tenantId       String
+  subscriptionId String?
+  metric         UsageMetric
+  quantity       Int         @default(0)
+  limitValue     Int?
+  periodStart    DateTime
+  periodEnd      DateTime
+  recordedAt     DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  tenant       Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  subscription Subscription? @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
+
+  @@unique([tenantId, metric, periodStart])
+  @@index([tenantId, periodEnd])
+}
+
+model WebhookEvent {
+  id          String             @id @default(cuid())
+  provider    BillingProvider
+  eventId     String             @db.VarChar(255)
+  eventType   String             @db.VarChar(160)
+  status      WebhookEventStatus @default(RECEIVED)
+  payload     Json
+  attempts    Int                @default(0)
+  lastError   String?            @db.Text
+  receivedAt  DateTime           @default(now())
+  processedAt DateTime?
+
+  @@unique([provider, eventId])
+  @@index([status, receivedAt])
+}
+
+// =============================================================================
+// CRM: customers, contacts, contracts, products & assets
+// =============================================================================
+
+model Customer {
+  id                String         @id @default(cuid())
+  tenantId          String
+  name              String         @db.VarChar(250)
+  type              CustomerType   @default(COMPANY)
+  email             String?        @db.VarChar(320)
+  phone             String?        @db.VarChar(32)
+  website           String?        @db.VarChar(255)
+  industry          String?        @db.VarChar(120)
+  taxId             String?        @db.VarChar(80)
+  status            CustomerStatus @default(ACTIVE)
+  healthScore       Int            @default(50)
+  ownerMembershipId String?
+  addressLine1      String?        @db.VarChar(250)
+  addressLine2      String?        @db.VarChar(250)
+  city              String?        @db.VarChar(120)
+  state             String?        @db.VarChar(120)
+  postalCode        String?        @db.VarChar(30)
+  countryCode       String?        @db.Char(2)
+  notes             String?        @db.Text
+  metadata          Json?
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+
+  tenant       Tenant            @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  owner        Membership?       @relation("CustomerOwner", fields: [ownerMembershipId], references: [id], onDelete: SetNull)
+  contacts     CustomerContact[]
+  tickets      Ticket[]
+  contracts    Contract[]
+  assets       Asset[]
+  orders       SalesOrder[]
+  workOrders   WorkOrder[]
+  quotations   Quotation[]
+  invoices     SalesInvoice[]
+  chatSessions ChatSession[]
+
+  @@index([tenantId, status])
+  @@index([tenantId, name])
+  @@index([tenantId, email])
+  @@index([ownerMembershipId])
+}
+
+model CustomerContact {
+  id                String    @id @default(cuid())
+  tenantId          String
+  customerId        String
+  userId            String?
+  firstName         String    @db.VarChar(100)
+  lastName          String    @db.VarChar(100)
+  email             String    @db.VarChar(320)
+  phone             String?   @db.VarChar(32)
+  title             String?   @db.VarChar(120)
+  isPrimary         Boolean   @default(false)
+  portalEnabled     Boolean   @default(false)
+  portalInvitedAt   DateTime?
+  portalLastLoginAt DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  tenant        Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  customer      Customer        @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  user          User?           @relation(fields: [userId], references: [id], onDelete: SetNull)
+  tickets       Ticket[]        @relation("TicketRequesterContact")
+  messages      TicketMessage[] @relation("TicketMessageSenderContact")
+  chatSessions  ChatSession[]
+  csatResponses CsatResponse[]  @relation("CsatContact")
+
+  @@unique([tenantId, email])
+  @@unique([customerId, userId])
+  @@index([tenantId, customerId, isPrimary])
+  @@index([userId])
+}
+
+model Contract {
+  id                String         @id @default(cuid())
+  tenantId          String
+  customerId        String
+  number            String         @db.VarChar(40)
+  title             String         @db.VarChar(250)
+  status            ContractStatus @default(DRAFT)
+  slaPolicyId       String?
+  startsAt          DateTime       @db.Date
+  endsAt            DateTime?      @db.Date
+  value             Decimal        @default(0) @db.Decimal(14, 2)
+  currency          String         @default("USD") @db.Char(3)
+  autoRenew         Boolean        @default(false)
+  renewalNoticeDays Int            @default(30)
+  documentUrl       String?
+  notes             String?        @db.Text
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+
+  tenant    Tenant     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  customer  Customer   @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  slaPolicy SlaPolicy? @relation(fields: [slaPolicyId], references: [id], onDelete: SetNull)
+  assets    Asset[]
+
+  @@unique([tenantId, number])
+  @@index([tenantId, customerId, status])
+  @@index([endsAt])
+}
+
+model Product {
+  id           String   @id @default(cuid())
+  tenantId     String
+  sku          String   @db.VarChar(80)
+  name         String   @db.VarChar(250)
+  description  String?  @db.Text
+  category     String?  @db.VarChar(120)
+  manufacturer String?  @db.VarChar(160)
+  unitPrice    Decimal  @default(0) @db.Decimal(12, 2)
+  costPrice    Decimal  @default(0) @db.Decimal(12, 2)
+  currency     String   @default("USD") @db.Char(3)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  tenant       Tenant             @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  assets       Asset[]
+  orderItems   OrderItem[]
+  quoteItems   QuotationItem[]
+  invoiceItems SalesInvoiceItem[]
+  spareParts   SparePart[]
+
+  @@unique([tenantId, sku])
+  @@index([tenantId, isActive])
+}
+
+model Asset {
+  id                String      @id @default(cuid())
+  tenantId          String
+  customerId        String
+  productId         String?
+  contractId        String?
+  name              String      @db.VarChar(250)
+  serialNumber      String?     @db.VarChar(160)
+  status            AssetStatus @default(ACTIVE)
+  location          String?     @db.VarChar(250)
+  purchasedAt       DateTime?
+  warrantyStartsAt  DateTime?
+  warrantyEndsAt    DateTime?
+  nextMaintenanceAt DateTime?
+  notes             String?     @db.Text
+  metadata          Json?
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+
+  tenant           Tenant            @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  customer         Customer          @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  product          Product?          @relation(fields: [productId], references: [id], onDelete: SetNull)
+  contract         Contract?         @relation(fields: [contractId], references: [id], onDelete: SetNull)
+  ticketAssets     TicketAsset[]
+  workOrders       WorkOrder[]
+  maintenancePlans MaintenancePlan[]
+
+  @@unique([tenantId, serialNumber])
+  @@index([tenantId, customerId, status])
+  @@index([tenantId, warrantyEndsAt])
+}
+
+model MaintenancePlan {
+  id              String    @id @default(cuid())
+  tenantId        String
+  assetId         String
+  name            String    @db.VarChar(160)
+  description     String?   @db.Text
+  intervalDays    Int       @default(90)
+  lastCompletedAt DateTime?
+  nextDueAt       DateTime?
+  isActive        Boolean   @default(true)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  tenant     Tenant      @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  asset      Asset       @relation(fields: [assetId], references: [id], onDelete: Cascade)
+  workOrders WorkOrder[]
+
+  @@index([tenantId, nextDueAt, isActive])
+  @@index([assetId])
+}
+
+// =============================================================================
+// ERP transactions: sales orders, work orders, quotations & invoices
+// =============================================================================
+
+model SalesOrder {
+  id                String           @id @default(cuid())
+  tenantId          String
+  customerId        String
+  number            String           @db.VarChar(40)
+  status            SalesOrderStatus @default(DRAFT)
+  currency          String           @default("USD") @db.Char(3)
+  subtotal          Decimal          @default(0) @db.Decimal(12, 2)
+  taxAmount         Decimal          @default(0) @db.Decimal(12, 2)
+  total             Decimal          @default(0) @db.Decimal(12, 2)
+  orderedAt         DateTime         @default(now())
+  fulfilledAt       DateTime?
+  externalReference String?          @db.VarChar(160)
+  notes             String?          @db.Text
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+
+  tenant   Tenant      @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  customer Customer    @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  items    OrderItem[]
+
+  @@unique([tenantId, number])
+  @@index([tenantId, customerId, orderedAt])
+}
+
+model OrderItem {
+  id             String   @id @default(cuid())
+  tenantId       String
+  salesOrderId   String
+  productId      String?
+  description    String   @db.VarChar(500)
+  quantity       Int      @default(1)
+  unitPrice      Decimal  @db.Decimal(12, 2)
+  discountAmount Decimal  @default(0) @db.Decimal(12, 2)
+  total          Decimal  @db.Decimal(12, 2)
+  createdAt      DateTime @default(now())
+
+  tenant     Tenant     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  salesOrder SalesOrder @relation(fields: [salesOrderId], references: [id], onDelete: Cascade)
+  product    Product?   @relation(fields: [productId], references: [id], onDelete: SetNull)
+
+  @@index([tenantId, salesOrderId])
+}
+
+model WorkOrder {
+  id                   String          @id @default(cuid())
+  tenantId             String
+  customerId           String
+  ticketId             String?
+  assetId              String?
+  maintenancePlanId    String?
+  assigneeMembershipId String?
+  number               String          @db.VarChar(40)
+  type                 WorkOrderType
+  status               WorkOrderStatus @default(DRAFT)
+  priority             TicketPriority  @default(MEDIUM)
+  title                String          @db.VarChar(250)
+  description          String?         @db.Text
+  scheduledStartAt     DateTime?
+  scheduledEndAt       DateTime?
+  startedAt            DateTime?
+  completedAt          DateTime?
+  laborCost            Decimal         @default(0) @db.Decimal(12, 2)
+  partsCost            Decimal         @default(0) @db.Decimal(12, 2)
+  totalCost            Decimal         @default(0) @db.Decimal(12, 2)
+  currency             String          @default("USD") @db.Char(3)
+  resolutionNotes      String?         @db.Text
+  createdAt            DateTime        @default(now())
+  updatedAt            DateTime        @updatedAt
+
+  tenant            Tenant             @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  customer          Customer           @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  ticket            Ticket?            @relation(fields: [ticketId], references: [id], onDelete: SetNull)
+  asset             Asset?             @relation(fields: [assetId], references: [id], onDelete: SetNull)
+  maintenancePlan   MaintenancePlan?   @relation(fields: [maintenancePlanId], references: [id], onDelete: SetNull)
+  assignee          Membership?        @relation("WorkOrderAssignee", fields: [assigneeMembershipId], references: [id], onDelete: SetNull)
+  quotations        Quotation[]
+  invoices          SalesInvoice[]
+  sparePartRequests SparePartRequest[]
+  timeEntries       TimeEntry[]
+
+  @@unique([tenantId, number])
+  @@index([tenantId, status, scheduledStartAt])
+  @@index([tenantId, customerId])
+  @@index([ticketId])
+  @@index([assigneeMembershipId])
+}
+
+model Quotation {
+  id             String          @id @default(cuid())
+  tenantId       String
+  customerId     String
+  ticketId       String?
+  workOrderId    String?
+  number         String          @db.VarChar(40)
+  status         QuotationStatus @default(DRAFT)
+  currency       String          @default("USD") @db.Char(3)
+  subtotal       Decimal         @default(0) @db.Decimal(12, 2)
+  discountAmount Decimal         @default(0) @db.Decimal(12, 2)
+  taxAmount      Decimal         @default(0) @db.Decimal(12, 2)
+  total          Decimal         @default(0) @db.Decimal(12, 2)
+  issuedAt       DateTime        @default(now())
+  validUntil     DateTime?
+  terms          String?         @db.Text
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  tenant    Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  customer  Customer        @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  ticket    Ticket?         @relation(fields: [ticketId], references: [id], onDelete: SetNull)
+  workOrder WorkOrder?      @relation(fields: [workOrderId], references: [id], onDelete: SetNull)
+  items     QuotationItem[]
+  invoices  SalesInvoice[]
+
+  @@unique([tenantId, number])
+  @@index([tenantId, customerId, status])
+  @@index([ticketId])
+}
+
+model QuotationItem {
+  id             String   @id @default(cuid())
+  tenantId       String
+  quotationId    String
+  productId      String?
+  description    String   @db.VarChar(500)
+  quantity       Int      @default(1)
+  unitPrice      Decimal  @db.Decimal(12, 2)
+  discountAmount Decimal  @default(0) @db.Decimal(12, 2)
+  total          Decimal  @db.Decimal(12, 2)
+  createdAt      DateTime @default(now())
+
+  tenant    Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  quotation Quotation @relation(fields: [quotationId], references: [id], onDelete: Cascade)
+  product   Product?  @relation(fields: [productId], references: [id], onDelete: SetNull)
+
+  @@index([tenantId, quotationId])
+}
+
+model SalesInvoice {
+  id             String             @id @default(cuid())
+  tenantId       String
+  customerId     String
+  ticketId       String?
+  workOrderId    String?
+  quotationId    String?
+  number         String             @db.VarChar(40)
+  status         SalesInvoiceStatus @default(DRAFT)
+  currency       String             @default("USD") @db.Char(3)
+  subtotal       Decimal            @default(0) @db.Decimal(12, 2)
+  discountAmount Decimal            @default(0) @db.Decimal(12, 2)
+  taxAmount      Decimal            @default(0) @db.Decimal(12, 2)
+  total          Decimal            @default(0) @db.Decimal(12, 2)
+  amountPaid     Decimal            @default(0) @db.Decimal(12, 2)
+  amountDue      Decimal            @default(0) @db.Decimal(12, 2)
+  issuedAt       DateTime?
+  dueAt          DateTime?
+  paidAt         DateTime?
+  notes          String?            @db.Text
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+
+  tenant    Tenant             @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  customer  Customer           @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  ticket    Ticket?            @relation(fields: [ticketId], references: [id], onDelete: SetNull)
+  workOrder WorkOrder?         @relation(fields: [workOrderId], references: [id], onDelete: SetNull)
+  quotation Quotation?         @relation(fields: [quotationId], references: [id], onDelete: SetNull)
+  items     SalesInvoiceItem[]
+  payments  SalesPayment[]
+
+  @@unique([tenantId, number])
+  @@index([tenantId, customerId, status])
+  @@index([tenantId, dueAt])
+  @@index([ticketId])
+}
+
+model SalesInvoiceItem {
+  id             String   @id @default(cuid())
+  tenantId       String
+  invoiceId      String
+  productId      String?
+  description    String   @db.VarChar(500)
+  quantity       Int      @default(1)
+  unitPrice      Decimal  @db.Decimal(12, 2)
+  discountAmount Decimal  @default(0) @db.Decimal(12, 2)
+  total          Decimal  @db.Decimal(12, 2)
+  createdAt      DateTime @default(now())
+
+  tenant  Tenant       @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  invoice SalesInvoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  product Product?     @relation(fields: [productId], references: [id], onDelete: SetNull)
+
+  @@index([tenantId, invoiceId])
+}
+
+model SalesPayment {
+  id        String   @id @default(cuid())
+  tenantId  String
+  invoiceId String
+  amount    Decimal  @db.Decimal(12, 2)
+  currency  String   @default("USD") @db.Char(3)
+  method    String   @db.VarChar(60)
+  reference String?  @db.VarChar(160)
+  paidAt    DateTime @default(now())
+  notes     String?  @db.Text
+  createdAt DateTime @default(now())
+
+  tenant  Tenant       @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  invoice SalesInvoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, invoiceId, paidAt])
+}
+
+model SparePart {
+  id           String   @id @default(cuid())
+  tenantId     String
+  sku          String   @db.VarChar(80)
+  name         String   @db.VarChar(250)
+  description  String?  @db.Text
+  productId    String?
+  unitPrice    Decimal  @default(0) @db.Decimal(12, 2)
+  currency     String   @default("USD") @db.Char(3)
+  stockQty     Int      @default(0)
+  reorderLevel Int      @default(0)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  tenant   Tenant             @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  product  Product?           @relation(fields: [productId], references: [id], onDelete: SetNull)
+  requests SparePartRequest[]
+
+  @@unique([tenantId, sku])
+  @@index([tenantId, isActive])
+}
+
+model SparePartRequest {
+  id                      String                 @id @default(cuid())
+  tenantId                String
+  ticketId                String?
+  workOrderId             String?
+  sparePartId             String
+  requestedByMembershipId String?
+  quantity                Int                    @default(1)
+  status                  SparePartRequestStatus @default(REQUESTED)
+  notes                   String?                @db.Text
+  createdAt               DateTime               @default(now())
+  updatedAt               DateTime               @updatedAt
+
+  tenant      Tenant      @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  ticket      Ticket?     @relation(fields: [ticketId], references: [id], onDelete: SetNull)
+  workOrder   WorkOrder?  @relation(fields: [workOrderId], references: [id], onDelete: SetNull)
+  sparePart   SparePart   @relation(fields: [sparePartId], references: [id], onDelete: Restrict)
+  requestedBy Membership? @relation(fields: [requestedByMembershipId], references: [id], onDelete: SetNull)
+
+  @@index([tenantId, status, createdAt])
+  @@index([ticketId])
+  @@index([workOrderId])
+}
+
+// =============================================================================
+// Advanced ticketing, SLA snapshots, conversations & CSAT
+// =============================================================================
+
+model Ticket {
+  id                      String         @id @default(cuid())
+  tenantId                String
+  number                  Int
+  subject                 String         @db.VarChar(500)
+  description             String         @db.Text
+  status                  TicketStatus   @default(OPEN)
+  priority                TicketPriority @default(MEDIUM)
+  type                    TicketType     @default(QUESTION)
+  channel                 TicketChannel  @default(PORTAL)
+  customerId              String
+  requesterContactId      String?
+  departmentId            String?
+  assigneeMembershipId    String?
+  slaPolicyId             String?
+  firstResponseDueAt      DateTime?
+  resolutionDueAt         DateTime?
+  firstRespondedAt        DateTime?
+  resolvedAt              DateTime?
+  closedAt                DateTime?
+  escalatedAt             DateTime?
+  escalationReason        String?        @db.Text
+  slaPausedAt             DateTime?
+  slaPausedMinutes        Int            @default(0)
+  firstResponseBreachedAt DateTime?
+  resolutionBreachedAt    DateTime?
+  reopenCount             Int            @default(0)
+  lastMessageAt           DateTime?
+  lastCustomerMessageAt   DateTime?
+  lastAgentMessageAt      DateTime?
+  resolutionSummary       String?        @db.Text
+  metadata                Json?
+  createdAt               DateTime       @default(now())
+  updatedAt               DateTime       @updatedAt
+
+  tenant     Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  customer   Customer         @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  requester  CustomerContact? @relation("TicketRequesterContact", fields: [requesterContactId], references: [id], onDelete: SetNull)
+  department Department?      @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+  assignee   Membership?      @relation("TicketAssignee", fields: [assigneeMembershipId], references: [id], onDelete: SetNull)
+  slaPolicy  SlaPolicy?       @relation(fields: [slaPolicyId], references: [id], onDelete: SetNull)
+
+  messages          TicketMessage[]
+  attachments       Attachment[]
+  tags              TicketTag[]
+  customFieldValues CustomFieldValue[]
+  activities        TicketActivity[]
+  slaEvents         SlaEvent[]
+  csatResponse      CsatResponse?
+  timeEntries       TimeEntry[]
+  chatSession       ChatSession?
+  assets            TicketAsset[]
+  workOrders        WorkOrder[]
+  quotations        Quotation[]
+  invoices          SalesInvoice[]
+  sparePartRequests SparePartRequest[]
+
+  @@unique([tenantId, number])
+  @@index([tenantId, status, priority])
+  @@index([tenantId, assigneeMembershipId, status])
+  @@index([tenantId, customerId, createdAt])
+  @@index([tenantId, departmentId, status])
+  @@index([tenantId, firstResponseDueAt])
+  @@index([tenantId, resolutionDueAt])
+}
+
+model TicketMessage {
+  id                String            @id @default(cuid())
+  tenantId          String
+  ticketId          String
+  senderType        MessageSenderType
+  senderUserId      String?
+  senderContactId   String?
+  visibility        MessageVisibility @default(PUBLIC)
+  channel           TicketChannel     @default(PORTAL)
+  body              String            @db.Text
+  bodyHtml          String?           @db.Text
+  externalMessageId String?           @db.VarChar(255)
+  editedAt          DateTime?
+  createdAt         DateTime          @default(now())
+
+  tenant        Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  ticket        Ticket           @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  senderUser    User?            @relation("TicketMessageSender", fields: [senderUserId], references: [id], onDelete: SetNull)
+  senderContact CustomerContact? @relation("TicketMessageSenderContact", fields: [senderContactId], references: [id], onDelete: SetNull)
+  attachments   Attachment[]
+  mentions      MessageMention[]
+
+  @@unique([tenantId, channel, externalMessageId])
+  @@index([tenantId, ticketId, createdAt])
+  @@index([senderUserId])
+}
+
+model Attachment {
+  id               String               @id @default(cuid())
+  tenantId         String
+  ticketId         String
+  messageId        String?
+  uploadedByUserId String?
+  fileName         String               @db.VarChar(255)
+  storageKey       String               @unique @db.VarChar(500)
+  mimeType         String               @db.VarChar(160)
+  sizeBytes        Int
+  checksum         String?              @db.VarChar(128)
+  scanStatus       AttachmentScanStatus @default(PENDING)
+  createdAt        DateTime             @default(now())
+
+  tenant     Tenant         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  ticket     Ticket         @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  message    TicketMessage? @relation(fields: [messageId], references: [id], onDelete: SetNull)
+  uploadedBy User?          @relation("AttachmentUploader", fields: [uploadedByUserId], references: [id], onDelete: SetNull)
+
+  @@index([tenantId, ticketId, createdAt])
+  @@index([messageId])
+}
+
+model Tag {
+  id          String   @id @default(cuid())
+  tenantId    String
+  name        String   @db.VarChar(80)
+  slug        String   @db.VarChar(80)
+  color       String   @db.VarChar(20)
+  description String?  @db.Text
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  tenant     Tenant      @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  ticketTags TicketTag[]
+
+  @@unique([tenantId, slug])
+  @@index([tenantId, name])
+}
+
+model TicketTag {
+  id        String   @id @default(cuid())
+  tenantId  String
+  ticketId  String
+  tagId     String
+  createdAt DateTime @default(now())
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  ticket Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  tag    Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@unique([ticketId, tagId])
+  @@index([tenantId, tagId])
+}
+
+model CustomFieldDefinition {
+  id                    String          @id @default(cuid())
+  tenantId              String
+  key                   String          @db.VarChar(80)
+  labelAr               String          @db.VarChar(160)
+  labelEn               String          @db.VarChar(160)
+  description           String?         @db.Text
+  type                  CustomFieldType
+  options               Json?
+  isRequired            Boolean         @default(false)
+  isActive              Boolean         @default(true)
+  sortOrder             Int             @default(0)
+  appliesToDepartmentId String?
+  createdAt             DateTime        @default(now())
+  updatedAt             DateTime        @updatedAt
+
+  tenant     Tenant             @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  department Department?        @relation(fields: [appliesToDepartmentId], references: [id], onDelete: SetNull)
+  values     CustomFieldValue[]
+
+  @@unique([tenantId, key])
+  @@index([tenantId, isActive, sortOrder])
+}
+
+model CustomFieldValue {
+  id        String   @id @default(cuid())
+  tenantId  String
+  ticketId  String
+  fieldId   String
+  value     Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tenant Tenant                @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  ticket Ticket                @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  field  CustomFieldDefinition @relation(fields: [fieldId], references: [id], onDelete: Cascade)
+
+  @@unique([ticketId, fieldId])
+  @@index([tenantId, fieldId])
+}
+
+model CannedResponse {
+  id              String   @id @default(cuid())
+  tenantId        String
+  title           String   @db.VarChar(160)
+  shortcut        String   @db.VarChar(60)
+  body            String   @db.Text
+  isActive        Boolean  @default(true)
+  createdByUserId String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  tenant    Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  createdBy User?  @relation("CannedResponseAuthor", fields: [createdByUserId], references: [id], onDelete: SetNull)
+
+  @@unique([tenantId, shortcut])
+  @@index([tenantId, isActive])
+}
+
+model TicketActivity {
+  id                String             @id @default(cuid())
+  tenantId          String
+  ticketId          String
+  actorMembershipId String?
+  type              TicketActivityType
+  body              String?            @db.Text
+  metadata          Json?
+  createdAt         DateTime           @default(now())
+
+  tenant Tenant      @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  ticket Ticket      @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  actor  Membership? @relation(fields: [actorMembershipId], references: [id], onDelete: SetNull)
+
+  @@index([tenantId, ticketId, createdAt])
+}
+
+model SlaEvent {
+  id         String    @id @default(cuid())
+  tenantId   String
+  ticketId   String
+  kind       SlaKind
+  state      SlaState
+  dueAt      DateTime
+  occurredAt DateTime?
+  createdAt  DateTime  @default(now())
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  ticket Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, ticketId, kind, createdAt])
+  @@index([tenantId, state, dueAt])
+}
+
+model CsatResponse {
+  id                   String   @id @default(cuid())
+  tenantId             String
+  ticketId             String   @unique
+  rating               Int
+  comment              String?  @db.Text
+  submittedByContactId String?
+  createdAt            DateTime @default(now())
+
+  tenant  Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  ticket  Ticket           @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  contact CustomerContact? @relation("CsatContact", fields: [submittedByContactId], references: [id], onDelete: SetNull)
+
+  @@index([tenantId, rating])
+  @@index([tenantId, createdAt])
+}
+
+model TimeEntry {
+  id           String   @id @default(cuid())
+  tenantId     String
+  ticketId     String?
+  workOrderId  String?
+  membershipId String?
+  description  String   @db.VarChar(500)
+  minutes      Int
+  billable     Boolean  @default(true)
+  hourlyRate   Decimal? @db.Decimal(12, 2)
+  startedAt    DateTime
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  tenant     Tenant      @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  ticket     Ticket?     @relation(fields: [ticketId], references: [id], onDelete: SetNull)
+  workOrder  WorkOrder?  @relation(fields: [workOrderId], references: [id], onDelete: SetNull)
+  membership Membership? @relation(fields: [membershipId], references: [id], onDelete: SetNull)
+
+  @@index([tenantId, ticketId])
+  @@index([tenantId, workOrderId])
+  @@index([membershipId, startedAt])
+}
+
+model TicketAsset {
+  id        String   @id @default(cuid())
+  tenantId  String
+  ticketId  String
+  assetId   String
+  createdAt DateTime @default(now())
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  ticket Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  asset  Asset  @relation(fields: [assetId], references: [id], onDelete: Cascade)
+
+  @@unique([ticketId, assetId])
+  @@index([tenantId, assetId])
+}
+
+model MessageMention {
+  id              String    @id @default(cuid())
+  tenantId        String
+  messageId       String
+  mentionedUserId String
+  readAt          DateTime?
+  createdAt       DateTime  @default(now())
+
+  tenant  Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  message TicketMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  user    User          @relation("MentionedUser", fields: [mentionedUserId], references: [id], onDelete: Cascade)
+
+  @@unique([messageId, mentionedUserId])
+  @@index([tenantId, mentionedUserId, readAt])
+}
+
+// =============================================================================
+// Real-time chat, notifications & audit
+// =============================================================================
+
+model ChatSession {
+  id                   String            @id @default(cuid())
+  tenantId             String
+  customerId           String?
+  contactId            String?
+  ticketId             String?           @unique
+  assignedMembershipId String?
+  status               ChatSessionStatus @default(WAITING)
+  subject              String?           @db.VarChar(250)
+  visitorName          String?           @db.VarChar(160)
+  visitorEmail         String?           @db.VarChar(320)
+  visitorTokenHash     String?
+  startedAt            DateTime          @default(now())
+  lastMessageAt        DateTime?
+  closedAt             DateTime?
+  createdAt            DateTime          @default(now())
+  updatedAt            DateTime          @updatedAt
+
+  tenant   Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  customer Customer?        @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  contact  CustomerContact? @relation(fields: [contactId], references: [id], onDelete: SetNull)
+  ticket   Ticket?          @relation(fields: [ticketId], references: [id], onDelete: SetNull)
+  assignee Membership?      @relation("ChatAssignee", fields: [assignedMembershipId], references: [id], onDelete: SetNull)
+  messages ChatMessage[]
+
+  @@index([tenantId, status, lastMessageAt])
+  @@index([tenantId, customerId])
+}
+
+model ChatMessage {
+  id           String            @id @default(cuid())
+  tenantId     String
+  sessionId    String
+  senderType   MessageSenderType
+  senderUserId String?
+  body         String            @db.Text
+  readAt       DateTime?
+  createdAt    DateTime          @default(now())
+
+  tenant  Tenant      @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  session ChatSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  sender  User?       @relation("ChatMessageSender", fields: [senderUserId], references: [id], onDelete: SetNull)
+
+  @@index([tenantId, sessionId, createdAt])
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  tenantId  String?
+  userId    String
+  type      NotificationType
+  title     String           @db.VarChar(220)
+  body      String?          @db.Text
+  href      String?
+  data      Json?
+  readAt    DateTime?
+  createdAt DateTime         @default(now())
+
+  tenant Tenant? @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, readAt, createdAt])
+  @@index([tenantId, createdAt])
+}
+
+model AuditLog {
+  id          String         @id @default(cuid())
+  tenantId    String?
+  actorUserId String?
+  actorType   AuditActorType @default(USER)
+  action      String         @db.VarChar(120)
+  entityType  String         @db.VarChar(80)
+  entityId    String?        @db.VarChar(80)
+  before      Json?
+  after       Json?
+  ipAddress   String?        @db.VarChar(64)
+  userAgent   String?        @db.Text
+  requestId   String?        @db.VarChar(120)
+  createdAt   DateTime       @default(now())
+
+  tenant Tenant? @relation(fields: [tenantId], references: [id], onDelete: SetNull)
+  actor  User?   @relation(fields: [actorUserId], references: [id], onDelete: SetNull)
+
+  @@index([tenantId, createdAt])
+  @@index([actorUserId, createdAt])
+  @@index([entityType, entityId])
+}
+
+// =============================================================================
+// Bilingual self-service knowledge base
+// =============================================================================
+
+model KbCategory {
+  id            String   @id @default(cuid())
+  tenantId      String
+  parentId      String?
+  slug          String   @db.VarChar(120)
+  nameAr        String   @db.VarChar(200)
+  nameEn        String   @db.VarChar(200)
+  descriptionAr String?  @db.Text
+  descriptionEn String?  @db.Text
+  sortOrder     Int      @default(0)
+  isPublished   Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  tenant   Tenant       @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  parent   KbCategory?  @relation("KbCategoryHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
+  children KbCategory[] @relation("KbCategoryHierarchy")
+  articles KbArticle[]
+  faqs     KbFaq[]
+
+  @@unique([tenantId, slug])
+  @@index([tenantId, parentId, sortOrder])
+}
+
+model KbArticle {
+  id              String          @id @default(cuid())
+  tenantId        String
+  categoryId      String?
+  authorUserId    String?
+  slug            String          @db.VarChar(180)
+  titleAr         String          @db.VarChar(300)
+  titleEn         String          @db.VarChar(300)
+  excerptAr       String?         @db.Text
+  excerptEn       String?         @db.Text
+  contentAr       String          @db.Text
+  contentEn       String          @db.Text
+  status          KnowledgeStatus @default(DRAFT)
+  keywords        String[]        @default([])
+  isFeatured      Boolean         @default(false)
+  publishedAt     DateTime?
+  viewCount       Int             @default(0)
+  helpfulCount    Int             @default(0)
+  notHelpfulCount Int             @default(0)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  tenant   Tenant              @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  category KbCategory?         @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  author   User?               @relation("KbArticleAuthor", fields: [authorUserId], references: [id], onDelete: SetNull)
+  feedback KbArticleFeedback[]
+
+  @@unique([tenantId, slug])
+  @@index([tenantId, status, publishedAt])
+  @@index([tenantId, categoryId])
+}
+
+model KbArticleFeedback {
+  id        String   @id @default(cuid())
+  tenantId  String
+  articleId String
+  userId    String?
+  isHelpful Boolean
+  comment   String?  @db.Text
+  createdAt DateTime @default(now())
+
+  tenant  Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  article KbArticle @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  user    User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([tenantId, articleId, createdAt])
+}
+
+model KbFaq {
+  id          String   @id @default(cuid())
+  tenantId    String
+  categoryId  String?
+  questionAr  String   @db.VarChar(500)
+  questionEn  String   @db.VarChar(500)
+  answerAr    String   @db.Text
+  answerEn    String   @db.Text
+  sortOrder   Int      @default(0)
+  isPublished Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  tenant   Tenant      @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  category KbCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  @@index([tenantId, categoryId, sortOrder])
+}

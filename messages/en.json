@@ -1,0 +1,1265 @@
+{
+  "Metadata": {
+    "title": "Sanad | Customer service & support ERP",
+    "description": "A multi-tenant SaaS platform for support tickets, SLAs, CRM, field operations and knowledge. Arabic-first with a complete English experience.",
+    "loginTitle": "Sign in",
+    "registerTitle": "Create a workspace"
+  },
+  "Common": {
+    "brand": "Sanad",
+    "brandFull": "Sanad ERP",
+    "email": "Email",
+    "password": "Password",
+    "backHome": "Back to home",
+    "or": "or",
+    "unlimited": "Unlimited",
+    "loading": "Loading…",
+    "close": "Close",
+    "open": "Open",
+    "save": "Save changes",
+    "saving": "Saving…",
+    "cancel": "Cancel",
+    "status": "Status",
+    "actions": "Actions",
+    "notAvailable": "—",
+    "days": "days",
+    "day": "day",
+    "from": "From",
+    "to": "To"
+  },
+  "Language": {
+    "switchTo": "العربية",
+    "label": "Language"
+  },
+  "Theme": {
+    "label": "Theme",
+    "toggle": "Toggle theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  },
+  "Nav": {
+    "features": "Features",
+    "workflow": "How it works",
+    "pricing": "Pricing",
+    "faq": "FAQ",
+    "login": "Sign in",
+    "start": "Start free",
+    "workspace": "Workspace",
+    "platform": "Platform admin"
+  },
+  "Landing": {
+    "hero": {
+      "badge": "Built for Arabic teams · RTL-first",
+      "titleLine1": "Calmer support,",
+      "titleLine2": "clearer operations.",
+      "description": "Tickets, SLAs, customers, assets and work orders in one workspace. Sanad gives support teams full context instead of ten disconnected tools.",
+      "primaryCta": "Try Sanad free",
+      "secondaryCta": "Explore pricing",
+      "note": "14 days free · No credit card · Set up in minutes",
+      "proofOne": "Strict tenant isolation",
+      "proofTwo": "Arabic and English",
+      "proofThree": "Role-based permissions"
+    },
+    "preview": {
+      "queue": "Support queue",
+      "queueSubtitle": "What needs your attention",
+      "sla": "SLA compliance",
+      "response": "Avg. first response",
+      "tickets": "Open tickets",
+      "ticketOne": "Unable to sign in to the customer portal",
+      "ticketTwo": "Preventive maintenance for production server",
+      "ticketThree": "Question about a service invoice",
+      "urgent": "Urgent",
+      "high": "High",
+      "normal": "Medium",
+      "inProgress": "In progress",
+      "waiting": "Waiting on customer",
+      "withinSla": "Within SLA",
+      "team": "Support team",
+      "navTickets": "Tickets",
+      "navOps": "Operations",
+      "navKb": "Knowledge",
+      "navReports": "Reports"
+    },
+    "capabilities": {
+      "tenantIsolation": "Isolated workspace per company",
+      "bilingual": "Arabic RTL and English LTR",
+      "rbac": "Fine-grained role permission",
+      "sla": "Live SLA deadlines"
+    },
+    "features": {
+      "eyebrow": "Why Sanad",
+      "title": "One foundation for support and operations.",
+      "description": "No separate helpdesk, CRM and maintenance system. Sanad is designed around the customer, the ticket and the asset.",
+      "items": {
+        "context": {
+          "title": "A true 360° customer view",
+          "description": "Contacts, contracts, assets, tickets and invoices in one place while the conversation is happening."
+        },
+        "sla": {
+          "title": "SLAs nothing slips through",
+          "description": "First-response and resolution targets by priority, business calendars, pauses and a clear breach trail."
+        },
+        "operations": {
+          "title": "From ticket to work order",
+          "description": "Create a work order, connect the asset and warranty, then issue a quotation or service invoice."
+        },
+        "collaboration": {
+          "title": "Collaboration without noise",
+          "description": "Private notes, teammate mentions and canned responses keep team context away from the customer."
+        },
+        "bilingual": {
+          "title": "Arabic-first, done properly",
+          "description": "A native RTL interface plus a complete English experience, not just translated labels."
+        },
+        "security": {
+          "title": "Isolation and security by default",
+          "description": "Every company has a separate workspace, permission-based roles and an audit trail for important events."
+        }
+      }
+    },
+    "workflow": {
+      "eyebrow": "Operating flow",
+      "title": "Context that carries from message to closure.",
+      "description": "Each step builds on the last without re-entering the same data.",
+      "steps": {
+        "one": {
+          "title": "Receive the ticket",
+          "description": "From the portal, email or chat, with priority, department and SLA assigned automatically."
+        },
+        "two": {
+          "title": "Understand customer and asset",
+          "description": "Open the customer, asset, warranty and contract while solving the issue."
+        },
+        "three": {
+          "title": "Do the work",
+          "description": "Dispatch a technician, request parts, keep internal notes and commit to clear dates."
+        },
+        "four": {
+          "title": "Close and measure",
+          "description": "Record the resolution, collect CSAT and issue a service invoice when needed."
+        }
+      }
+    },
+    "faq": {
+      "eyebrow": "FAQ",
+      "title": "Before you start.",
+      "items": {
+        "trial": {
+          "question": "Does the free trial require a credit card?",
+          "answer": "No. You get a complete workspace for 14 days without a card. The plan you choose is recorded at signup and your data stays yours."
+        },
+        "lang": {
+          "question": "Can we use the platform in English?",
+          "answer": "Yes. Arabic is the primary language with a native RTL interface, and every user can switch to English LTR at any time. Knowledge-base content supports both languages."
+        },
+        "isolation": {
+          "question": "How is each company's data isolated?",
+          "answer": "Every operational record is linked to a tenantId, and business identifiers are unique inside the tenant only. Access requires an active workspace membership, and permissions are enforced on the server."
+        },
+        "roles": {
+          "question": "Can roles be customized?",
+          "answer": "Yes. Five system roles are included — owner, admin, agent, technician and billing manager — and each tenant can create custom roles with selected permissions."
+        },
+        "data": {
+          "question": "Do I lose my data when the trial ends?",
+          "answer": "Your workspace data remains stored. The trial converts to a paid subscription when billing is activated, and data is not deleted automatically when the trial ends."
+        }
+      }
+    },
+    "cta": {
+      "eyebrow": "Ready to begin?",
+      "title": "Bring your team into one support workspace.",
+      "description": "Create an isolated workspace, get default departments and SLAs, and start in minutes.",
+      "button": "Create a workspace"
+    },
+    "footer": {
+      "tagline": "The support and operations platform for Arabic teams.",
+      "product": "Product",
+      "company": "Platform",
+      "features": "Features",
+      "pricing": "Pricing",
+      "faq": "FAQ",
+      "login": "Sign in",
+      "register": "Create a workspace",
+      "status": "Platform status",
+      "copyright": "© {year} Sanad. All rights reserved."
+    }
+  },
+  "Pricing": {
+    "eyebrow": "Straightforward plans",
+    "title": "Pricing that fits your stage.",
+    "description": "Start with a 14-day trial on any plan. Prices are in USD and you can change plans as you grow.",
+    "monthly": "Monthly",
+    "annual": "Annual",
+    "annualBadge": "Two months free",
+    "perMonth": "per month",
+    "perYear": "per year",
+    "billedAnnually": "Billed annually",
+    "equivalentPerMonth": "About {amount} per month",
+    "freeTrial": "14 days free",
+    "noCard": "No credit card",
+    "startTrial": "Start trial",
+    "popular": "Most popular",
+    "unlimited": "Unlimited",
+    "limits": {
+      "agents": "agents",
+      "tickets": "tickets / month",
+      "storage": "storage",
+      "departments": "departments",
+      "customers": "active customers",
+      "articles": "knowledge articles"
+    },
+    "includes": "Includes",
+    "moreFeatures": "+{count} more features",
+    "storageValue": "{value} GB",
+    "footnote": "Prices exclude applicable taxes. Subscriptions and invoices are managed from workspace settings."
+  },
+  "Auth": {
+    "shell": {
+      "eyebrow": "One workspace",
+      "title": "Organized support. A team with context.",
+      "description": "Tickets, SLAs, work orders and a knowledge base with complete tenant isolation and a native Arabic experience.",
+      "pointOne": "Strict company data isolation",
+      "pointTwo": "Role-based permissions",
+      "pointThree": "Arabic and English with instant switching",
+      "trust": "Your workspace data stays within its boundary.",
+      "cardTitle": "Verified access layer",
+      "cardIsolation": "Tenant-isolated data scope",
+      "cardRbac": "Permissions resolved from the database",
+      "cardSession": "Signed JWT session, 12 hours"
+    },
+    "login": {
+      "eyebrow": "Sign in",
+      "title": "Welcome back.",
+      "subtitle": "Sign in to your workspace to continue with tickets and your team.",
+      "submit": "Sign in",
+      "submitting": "Signing in…",
+      "noAccount": "Don't have a workspace?",
+      "createAccount": "Create a new workspace",
+      "emailPlaceholder": "name@company.com",
+      "passwordPlaceholder": "Your password"
+    },
+    "register": {
+      "eyebrow": "Get started",
+      "title": "Create your workspace.",
+      "subtitle": "14 days free on the selected plan, no credit card required.",
+      "company": "Company name",
+      "companyPlaceholder": "Al Noor Technology",
+      "slug": "Workspace URL",
+      "slugPlaceholder": "alnoor",
+      "slugHint": "Lowercase English letters, numbers and hyphens only. This is difficult to change later.",
+      "fullName": "Your full name",
+      "fullNamePlaceholder": "Sara Alotaibi",
+      "emailPlaceholder": "name@company.com",
+      "passwordHint": "At least 12 characters, including a letter and a number.",
+      "confirmPassword": "Confirm password",
+      "terms": "I agree to the terms of use and privacy policy.",
+      "submit": "Create workspace",
+      "submitting": "Preparing your workspace…",
+      "haveAccount": "Already have a workspace?",
+      "signIn": "Sign in",
+      "selectedPlan": "Selected plan",
+      "changePlan": "Change plan",
+      "trialNote": "Your trial starts immediately. No payment required.",
+      "billingMonthly": "Monthly billing",
+      "billingAnnual": "Annual billing"
+    },
+    "errors": {
+      "invalidCredentials": "The email or password is incorrect.",
+      "rateLimited": "Too many attempts. Wait a moment and try again.",
+      "generic": "Something went wrong. Please try again.",
+      "accountAlreadyExists": "The account could not be created. Check the email and workspace URL.",
+      "accountCreatedSignInFailed": "Your workspace was created, but automatic sign-in failed. Please sign in instead.",
+      "planUnavailable": "The selected plan is currently unavailable. Choose another plan."
+    }
+  },
+  "Validation": {
+    "emailRequired": "Enter your email address.",
+    "emailInvalid": "Enter a valid email address.",
+    "passwordRequired": "Enter your password.",
+    "passwordLength": "Password must be between 12 and 72 characters.",
+    "passwordLetter": "Add at least one letter to the password.",
+    "passwordNumber": "Add at least one number to the password.",
+    "passwordMismatch": "Passwords do not match.",
+    "confirmRequired": "Confirm your password.",
+    "companyRequired": "Enter your company name.",
+    "companyLength": "Company name must be between 2 and 200 characters.",
+    "slugRequired": "Enter a workspace URL.",
+    "slugLength": "The URL must be between 3 and 40 characters.",
+    "slugFormat": "Use lowercase English letters, numbers and hyphens only.",
+    "slugReserved": "This URL is reserved. Choose another one.",
+    "slugTaken": "This URL is already in use.",
+    "nameRequired": "Enter your name.",
+    "nameLength": "Name must be between 2 and 120 characters.",
+    "termsRequired": "You must accept the terms to continue.",
+    "planInvalid": "Choose a valid plan.",
+    "intervalInvalid": "Choose a valid billing interval.",
+    "emailTaken": "An account with this email already exists. Try signing in."
+  },
+  "App": {
+    "nav": {
+      "dashboard": "Overview",
+      "analytics": "Analytics & Reports",
+      "tickets": "Tickets & Helpdesk",
+      "chat": "Live Chat",
+      "kb": "Knowledge Base",
+      "crm": "Customers (CRM)",
+      "operations": "Operations & Assets",
+      "team": "Team & roles",
+      "settings": "Workspace settings",
+      "billing": "Billing & Subscription",
+      "platform": "Platform admin",
+      "home": "Home"
+    },
+    "shell": {
+      "workspace": "Workspace",
+      "role": "Role",
+      "plan": "Plan",
+      "trialEnds": "Trial ends {date}",
+      "trialDaysLeft": "{days} days left",
+      "account": "Account",
+      "signOut": "Sign out",
+      "menuOpen": "Open menu",
+      "menuClose": "Close menu",
+      "switchWorkspace": "Switch workspace",
+      "phase": "Phase 2 · Access layer",
+      "trial": "Free trial"
+    },
+    "blocked": {
+      "suspendedTitle": "Workspace suspended",
+      "suspendedDescription": "Access to this workspace has been paused. Contact the account owner or the platform team.",
+      "canceledTitle": "Subscription canceled",
+      "canceledDescription": "This subscription is no longer active. Contact the account owner or the platform team.",
+      "provisioningTitle": "Workspace is being prepared",
+      "provisioningDescription": "This workspace is not ready yet. Try again later or contact support.",
+      "signOut": "Sign out",
+      "contact": "Contact support"
+    },
+    "chooser": {
+      "eyebrow": "Workspaces",
+      "title": "Choose a workspace.",
+      "subtitle": "You are a member of more than one company. Choose where you want to work.",
+      "open": "Open workspace",
+      "role": "Your role: {role}",
+      "trial": "Free trial",
+      "active": "Active",
+      "suspended": "Suspended",
+      "noWorkspacesTitle": "No workspace yet",
+      "noWorkspacesDescription": "Your account is ready but is not linked to an active company. Ask a company admin to invite you, or create a new workspace with another email.",
+      "createWorkspace": "Create a workspace",
+      "platformConsole": "Open platform admin"
+    },
+    "accessDenied": {
+      "title": "You don't have this permission",
+      "description": "Your current role does not grant access to this page. Ask the workspace owner if you need it.",
+      "back": "Back to overview"
+    }
+  },
+  "Dashboard": {
+    "eyebrow": "{tenant} workspace",
+    "title": "Good morning, {name}.",
+    "subtitle": "A quick operational view of this workspace. The full ticket and SLA workspace arrives in Phase 4.",
+    "stats": {
+      "tickets": "Total tickets",
+      "open": "Open tickets",
+      "customers": "Customers",
+      "team": "Team members",
+      "ticketsHint": "All tickets inside this company",
+      "openHint": "Open, in progress or pending customer",
+      "customersHint": "Active CRM records",
+      "teamHint": "Active memberships"
+    },
+    "setup": {
+      "title": "Workspace readiness",
+      "description": "The foundations created automatically at signup.",
+      "workspace": "Workspace and plan",
+      "workspaceDone": "Active",
+      "sla": "SLA policy and response targets",
+      "slaDone": "{count} priority targets",
+      "departments": "Operating departments",
+      "departmentsDone": "{count} departments",
+      "customers": "First customer",
+      "customersDone": "{count} customers",
+      "team": "Team membership",
+      "teamDone": "{count} active members",
+      "pending": "Setting up",
+      "completed": "Complete"
+    },
+    "access": {
+      "title": "Your current permissions",
+      "description": "Calculated from the role stored in the database, not from the UI.",
+      "role": "Role",
+      "permissions": "Enabled permissions",
+      "plan": "Plan & subscription",
+      "trial": "Free trial",
+      "memberSince": "Member since",
+      "phase": "Phase 2 delivers authentication, isolation and RBAC. Tickets and analytics will build on this layer."
+    },
+    "quickLinks": {
+      "title": "Manage the workspace",
+      "team": "Review team and roles",
+      "settings": "Review company and subscription"
+    }
+  },
+  "Team": {
+    "eyebrow": "People & permissions",
+    "title": "Workspace team",
+    "subtitle": "Every member operates inside this company only, and permissions come from their role.",
+    "count": "{count} memberships",
+    "you": "you",
+    "table": {
+      "member": "Member",
+      "role": "Role",
+      "department": "Department",
+      "status": "Status",
+      "joined": "Joined"
+    },
+    "roles": {
+      "custom": "Custom role",
+      "permissions": "{count} permissions"
+    },
+    "status": {
+      "ACTIVE": "Active",
+      "INVITED": "Invited",
+      "SUSPENDED": "Suspended",
+      "REMOVED": "Removed"
+    },
+    "empty": "No members yet."
+  },
+  "Settings": {
+    "eyebrow": "Workspace configuration",
+    "title": "Settings",
+    "subtitle": "Core company details and the default support channel.",
+    "profileTitle": "Profile",
+    "profileDescription": "These details are visible to your team and used in customer communication.",
+    "companyName": "Company name",
+    "supportEmail": "Support email",
+    "supportPhone": "Support phone",
+    "slug": "Workspace URL",
+    "slugNote": "The current URL is tied to company data and cannot be changed here.",
+    "timezone": "Time zone",
+    "defaultLocale": "Default language",
+    "save": "Save changes",
+    "saving": "Saving…",
+    "saved": "Workspace details were saved.",
+    "readOnly": "You can view settings only. Editing requires the settings management permission.",
+    "errors": {
+      "name": "Company name must be between 2 and 200 characters.",
+      "email": "Enter a valid support email.",
+      "phone": "Enter a valid phone number or leave it empty.",
+      "generic": "Settings could not be saved. Try again.",
+      "forbidden": "You do not have permission to edit settings."
+    },
+    "planTitle": "Plan & subscription",
+    "planDescription": "A summary of the current subscription for this workspace.",
+    "plan": "Plan",
+    "interval": "Billing interval",
+    "status": "Subscription status",
+    "trialEnds": "Trial end",
+    "billingNote": "Manage invoices and plan upgrades from the Billing tab.",
+    "manageBilling": "Manage Subscription & Upgrade",
+    "monthly": "Monthly",
+    "annual": "Annual",
+    "subscriptionStatus": {
+      "TRIALING": "Free trial",
+      "ACTIVE": "Active",
+      "PAST_DUE": "Past due",
+      "PAUSED": "Paused",
+      "CANCELED": "Canceled",
+      "UNPAID": "Unpaid",
+      "INCOMPLETE": "Incomplete",
+      "INCOMPLETE_EXPIRED": "Incomplete expired"
+    },
+    "billing": {
+      "title": "Subscription & Billing",
+      "subtitle": "Manage your subscription tier, track usage quotas, and view invoice history.",
+      "backToSettings": "Back to Settings",
+      "managePaymentMethod": "Manage Payment Method",
+      "portalError": "Failed to open customer portal.",
+      "paymentSuccessTitle": "Payment successful & plan activated!",
+      "paymentSuccessDesc": "Thank you for upgrading Sanad ERP. Workspace quotas and features have been updated immediately.",
+      "billedAnnual": "Billed annually (2 months free)",
+      "billedMonthly": "Billed monthly",
+      "renewsOn": "Renews on {date}",
+      "trialDaysLeft": "Trial period: {days} days remaining",
+      "currentCommitment": "Current commitment",
+      "year": "year",
+      "month": "month",
+      "usageTitle": "Plan Quotas & Monthly Usage",
+      "usageSubtitle": "Real-time tracking of seats, tickets, and storage consumed versus your active plan limits.",
+      "liveTracking": "Live sync",
+      "metricAgents": "Active Team Seats",
+      "metricTickets": "Monthly Tickets",
+      "metricStorage": "Attachments & Storage (MB)",
+      "metricDepartments": "Operational Departments",
+      "metricArticles": "Knowledge Base Articles",
+      "metricCustomers": "Active Customers",
+      "unlimitedMetric": "Unlimited",
+      "used": "used",
+      "remaining": "{count} remaining",
+      "changePlanTitle": "Upgrade Plan",
+      "selectSuitablePlan": "Choose the right plan for your business scale",
+      "changePlanSubtitle": "Upgrade at any time or switch between monthly and annual billing cycles.",
+      "monthly": "Monthly billing",
+      "annual": "Annual billing",
+      "save20": "Save 20%",
+      "recommended": "Recommended",
+      "currentPlanBadge": "Current Plan",
+      "activePlan": "Active Plan",
+      "selectPlan": "Select Plan",
+      "upgradeSuccess": "Plan and workspace upgraded successfully.",
+      "upgradeError": "Failed to upgrade plan. Please try again.",
+      "invoicesTitle": "Invoices & Payment History",
+      "noInvoices": "No invoices generated yet.",
+      "invoiceStatus_PAID": "Paid",
+      "invoiceStatus_OPEN": "Due",
+      "invoiceStatus_DRAFT": "Draft",
+      "invoiceStatus_VOID": "Void",
+      "invoiceStatus_UNCOLLECTIBLE": "Uncollectible",
+      "download": "Download PDF"
+    }
+  },
+  "Platform": {
+    "eyebrow": "Platform administration",
+    "title": "Sanad operations center.",
+    "subtitle": "Platform Owner command center: revenue, tenants, subscription plans, and security audit trail.",
+    "nav": {
+      "overview": "Overview",
+      "workspaces": "Workspaces",
+      "tenants": "Tenants & Companies",
+      "plans": "Subscription Plans",
+      "audit": "Audit Log"
+    },
+    "revenue": {
+      "mrr": "Monthly Recurring Revenue (MRR)",
+      "arr": "Annual Recurring Revenue (ARR)",
+      "churnRate": "Subscriber Churn Rate (30d)"
+    },
+    "quickTenantsHint": "Manage, suspend, and reactivate tenant workspaces",
+    "quickPlansHint": "Configure pricing, quotas, and included features",
+    "quickAuditHint": "Monitor administrative actions and security trail",
+    "viewAllTenants": "View all tenants",
+    "stats": {
+      "tenants": "Total tenants",
+      "active": "Active subscriptions",
+      "trials": "In trial",
+      "users": "Platform users",
+      "allPlatformUsers": "Across all workspaces"
+    },
+    "table": {
+      "tenant": "Company",
+      "status": "Tenant status",
+      "plan": "Plan",
+      "created": "Created",
+      "trial": "Trial end"
+    },
+    "tenants": {
+      "title": "Tenant & Company Management",
+      "subtitle": "Inspect registered workspaces, filter by lifecycle status, suspend or reactivate companies.",
+      "totalCount": "Total: {count} companies",
+      "filterAll": "All",
+      "searchPlaceholder": "Search by company name, slug, or email…",
+      "colTenant": "Company",
+      "colStatus": "Status",
+      "colPlan": "Plan & Billing",
+      "colMembers": "Members",
+      "colCreated": "Created",
+      "colActions": "Actions",
+      "empty": "No companies found matching your criteria.",
+      "annual": "annual",
+      "monthly": "monthly",
+      "membersCount": "members",
+      "suspend": "Suspend",
+      "activate": "Activate",
+      "suspendModalTitle": "Suspend Tenant Workspace",
+      "suspendWarning": "Suspending this workspace will immediately block all company staff members from accessing the workspace until reactivated.",
+      "suspendReasonLabel": "Suspension Reason (optional)",
+      "suspendReasonPlaceholder": "e.g. Terms violation or requested maintenance hold…",
+      "cancel": "Cancel",
+      "confirmSuspend": "Confirm Suspension",
+      "suspendedSuccess": "{name} has been suspended.",
+      "activatedSuccess": "{name} has been activated."
+    },
+    "plans": {
+      "title": "Subscription Plans & Pricing",
+      "subtitle": "Configure SaaS tiers, monthly/annual rates, quota limits, and enabled feature sets.",
+      "plansCount": "{count} active tiers",
+      "popularBadge": "Most Popular",
+      "monthlyPrice": "Monthly Price",
+      "annualPrice": "Annual Price",
+      "month": "mo",
+      "year": "yr",
+      "activeSubscribers": "Active Subscribers",
+      "limitsTitle": "Quota Limits",
+      "featuresTitle": "Included Features",
+      "statusActive": "Active",
+      "statusArchived": "Archived",
+      "statusChanged": "Plan {name} status changed to {status}.",
+      "unlimited": "Unlimited",
+      "metric_AGENTS": "Max Agents (Seats)",
+      "metric_TICKETS_PER_MONTH": "Monthly Tickets",
+      "metric_STORAGE_MB": "Storage Quota (MB)",
+      "metric_DEPARTMENTS": "Departments",
+      "metric_KNOWLEDGE_BASE_ARTICLES": "Knowledge Base Articles",
+      "metric_MONTHLY_ACTIVE_CUSTOMERS": "Monthly Active Customers"
+    },
+    "audit": {
+      "title": "Platform Security & Audit Log",
+      "subtitle": "Tamper-evident trail of all administrative and lifecycle events across the platform and tenant workspaces.",
+      "logCount": "{count} events recorded",
+      "colAction": "Action",
+      "colActor": "Actor",
+      "colTenant": "Workspace",
+      "colEntity": "Entity",
+      "colDate": "Timestamp",
+      "empty": "No audit records found."
+    },
+    "statuses": {
+      "PROVISIONING": "Provisioning",
+      "TRIALING": "Trial",
+      "ACTIVE": "Active",
+      "PAST_DUE": "Past due",
+      "SUSPENDED": "Suspended",
+      "CANCELED": "Canceled"
+    },
+    "empty": "No tenants registered yet.",
+    "backToWorkspaces": "Workspaces",
+    "platformBadge": "Platform owner",
+    "currentUser": "Account",
+    "overviewNote": "Platform-wide view",
+    "phaseNote": "This is the Phase 2 introductory console. Plan management, suspension, billing and the MRR dashboard arrive in Phase 3."
+  },
+  "Tickets": {
+    "title": "Tickets & Helpdesk",
+    "subtitle": "Manage customer issues, track SLA commitments, and resolve support requests",
+    "filterAll": "All",
+    "filterPriority": "Priority",
+    "priorities": {
+      "ALL": "All Priorities",
+      "LOW": "Low",
+      "MEDIUM": "Medium",
+      "HIGH": "High",
+      "URGENT": "Urgent"
+    },
+    "statuses": {
+      "OPEN": "Open",
+      "IN_PROGRESS": "In Progress",
+      "PENDING_CUSTOMER": "Pending Customer",
+      "ESCALATED": "Escalated",
+      "RESOLVED": "Resolved",
+      "CLOSED": "Closed"
+    },
+    "viewDetails": "View Details",
+    "unassigned": "Unassigned",
+    "metrics": {
+      "total": "Total Tickets",
+      "active": "Active Tickets",
+      "escalated": "Escalated",
+      "resolved": "Resolved"
+    },
+    "table": {
+      "ticket": "Ticket",
+      "customer": "Customer",
+      "priority": "Priority",
+      "status": "Status",
+      "sla": "SLA Timer",
+      "assignee": "Assignee",
+      "date": "Created Date",
+      "action": "Action"
+    },
+    "emptyTitle": "No tickets found",
+    "emptyDescription": "No tickets match the selected filters or search criteria.",
+    "searchPlaceholder": "Search by ticket number or subject…",
+    "backToTickets": "Back to tickets",
+    "initialDescription": "Initial Customer Request / Issue Description",
+    "controlsTitle": "Ticket Controls",
+    "statusLabel": "Ticket Status",
+    "assigneeLabel": "Assigned Staff Member",
+    "markResolved": "Mark as Resolved",
+    "reopenTicket": "Reopen Ticket",
+    "statusUpdatedSuccess": "Ticket status updated successfully.",
+    "statusUpdateError": "Failed to update ticket status.",
+    "assigneeUpdatedSuccess": "Ticket assignee updated successfully.",
+    "assigneeUpdateError": "Failed to update ticket assignee.",
+    "slaCardTitle": "Service Level Agreement (SLA)",
+    "firstResponseTarget": "First Response Target",
+    "resolutionTarget": "Resolution Target",
+    "slaMet": "SLA Met",
+    "customerCardTitle": "Customer 360",
+    "healthScore": "Health Score",
+    "operationsCardTitle": "Linked ERP Operations",
+    "linkedWorkOrders": "Work Orders",
+    "noWorkOrdersLinked": "No work orders linked to this ticket yet.",
+    "linkedQuotations": "Quotations",
+    "noQuotationsLinked": "No quotations linked to this ticket yet.",
+    "manageOperationsLink": "Manage Operations & Assets",
+    "create": {
+      "button": "New Ticket",
+      "title": "Create Support Ticket",
+      "subtitle": "Submit a new customer issue with automated SLA due date calculation",
+      "subjectLabel": "Ticket Subject",
+      "subjectPlaceholder": "e.g., Portal dashboard error after recent system update",
+      "descriptionLabel": "Issue Description",
+      "descriptionPlaceholder": "Describe the customer issue, symptoms, or requirements in detail…",
+      "customerLabel": "Customer",
+      "departmentLabel": "Department",
+      "noneDepartment": "No department assigned",
+      "priorityLabel": "Priority",
+      "typeLabel": "Ticket Type",
+      "types": {
+        "QUESTION": "Question",
+        "INCIDENT": "Incident",
+        "PROBLEM": "Problem",
+        "FEATURE_REQUEST": "Feature Request",
+        "SERVICE_REQUEST": "Field Service Request"
+      },
+      "cancel": "Cancel",
+      "submit": "Create Ticket",
+      "createdSuccess": "Ticket created successfully.",
+      "createdError": "Failed to create ticket.",
+      "fillRequiredFields": "Please fill in all required fields."
+    },
+    "conversation": {
+      "noMessages": "No messages in this ticket yet.",
+      "agent": "Support Agent",
+      "customer": "Customer",
+      "system": "System",
+      "agentBadge": "Agent",
+      "customerBadge": "Customer",
+      "internalNoteBadge": "Internal Note",
+      "replyToCustomer": "Customer Reply",
+      "internalNote": "Internal Note",
+      "internalNoteHint": "This note is confidential and visible only to staff members. It will never be seen by the customer.",
+      "replyPlaceholder": "Write a public reply to the customer…",
+      "internalNotePlaceholder": "Write an internal note or instructions for staff…",
+      "shortcutHint": "Press Ctrl+Enter or ⌘+Enter to send quickly",
+      "submitReply": "Send Reply",
+      "submitNote": "Save Internal Note",
+      "replyPostedSuccess": "Reply posted successfully.",
+      "notePostedSuccess": "Internal note saved successfully.",
+      "postFailed": "Failed to post message."
+    }
+  },
+  "Crm": {
+    "title": "Customer Relationship Management (CRM)",
+    "subtitle": "Customer directory, asset tracking, health scores, and support history",
+    "filterAll": "All",
+    "types": {
+      "COMPANY": "Companies",
+      "INDIVIDUAL": "Individuals"
+    },
+    "searchPlaceholder": "Search by customer name, email, phone, or city…",
+    "metrics": {
+      "total": "Total Customers",
+      "companies": "Companies",
+      "individuals": "Individuals",
+      "assets": "Tracked Assets"
+    },
+    "emptyTitle": "No customers found",
+    "emptyDescription": "No registered customers match your current search.",
+    "table": {
+      "customer": "Customer",
+      "type": "Type",
+      "contact": "Contact Info",
+      "industry": "Industry & Location",
+      "health": "Health Score",
+      "tickets": "Tickets",
+      "assets": "Assets",
+      "created": "Registered"
+    },
+    "create": {
+      "button": "Add Customer",
+      "title": "Register New Customer",
+      "subtitle": "Add a company or individual account to the CRM database",
+      "nameLabel": "Customer Name",
+      "namePlaceholder": "e.g., Acme Industrial Solutions Ltd.",
+      "typeLabel": "Account Type",
+      "types": {
+        "COMPANY": "Company (B2B)",
+        "INDIVIDUAL": "Individual (B2C)"
+      },
+      "industryLabel": "Industry",
+      "industryPlaceholder": "IT, Logistics, Manufacturing…",
+      "emailLabel": "Email Address",
+      "phoneLabel": "Phone Number",
+      "cityLabel": "City",
+      "cityPlaceholder": "Riyadh, Jeddah…",
+      "cancel": "Cancel",
+      "submit": "Save Customer",
+      "createdSuccess": "Customer added successfully.",
+      "createdError": "Failed to add customer.",
+      "fillRequiredFields": "Please provide the customer name."
+    }
+  },
+  "Operations": {
+    "title": "Operations & Field Assets",
+    "subtitle": "Manage work orders, price quotations, and customer hardware/assets",
+    "metrics": {
+      "workOrders": "Work Orders",
+      "quotations": "Quotations",
+      "pipelineValue": "Pipeline Value",
+      "trackedAssets": "Tracked Assets"
+    },
+    "tabs": {
+      "workOrders": "Work Orders",
+      "quotations": "Quotations",
+      "assets": "Customer Assets"
+    },
+    "emptyWorkOrdersTitle": "No work orders",
+    "emptyWorkOrdersDescription": "No work orders have been issued yet.",
+    "emptyQuotationsTitle": "No quotations",
+    "emptyQuotationsDescription": "No price quotations have been created yet.",
+    "emptyAssetsTitle": "No assets registered",
+    "emptyAssetsDescription": "No customer assets or equipment registered yet.",
+    "table": {
+      "orderNumber": "Order #",
+      "title": "Title",
+      "customer": "Customer",
+      "type": "Type",
+      "priority": "Priority",
+      "status": "Status",
+      "date": "Date",
+      "quoteNumber": "Quote #",
+      "itemsCount": "Items",
+      "total": "Total Amount",
+      "assetName": "Asset Name",
+      "serial": "Serial Number",
+      "location": "Location"
+    },
+    "itemsUnit": "items",
+    "createAsset": {
+      "button": "Register Asset",
+      "title": "Register Customer Asset",
+      "subtitle": "Link hardware, machines, or software licenses to a customer account",
+      "customerLabel": "Customer",
+      "nameLabel": "Asset Name",
+      "namePlaceholder": "e.g., Dell PowerEdge Server R740",
+      "serialLabel": "Serial Number",
+      "locationLabel": "Physical Location",
+      "locationPlaceholder": "Server Room - Floor 2",
+      "cancel": "Cancel",
+      "submit": "Register Asset",
+      "createdSuccess": "Asset registered successfully.",
+      "createdError": "Failed to register asset.",
+      "fillRequiredFields": "Please provide an asset name and select a customer."
+    },
+    "createWorkOrder": {
+      "button": "New Work Order",
+      "title": "Issue Work Order",
+      "subtitle": "Dispatch field technical support or maintenance operations",
+      "customerLabel": "Customer",
+      "titleLabel": "Work Order Title",
+      "titlePlaceholder": "e.g., Replace power supply unit and conduct network diagnostic",
+      "typeLabel": "Work Order Type",
+      "types": {
+        "CORRECTIVE": "Corrective Maintenance",
+        "PREVENTIVE": "Preventive Maintenance",
+        "INSPECTION": "Inspection & Testing",
+        "INSTALLATION": "Deployment & Installation"
+      },
+      "priorityLabel": "Priority",
+      "priorities": {
+        "LOW": "Low",
+        "MEDIUM": "Medium",
+        "HIGH": "High",
+        "URGENT": "Urgent"
+      },
+      "descriptionLabel": "Instructions & Scope",
+      "descriptionPlaceholder": "Detail technical requirements, diagnostic tasks, or safety guidelines…",
+      "cancel": "Cancel",
+      "submit": "Issue Work Order",
+      "createdSuccess": "Work order issued successfully.",
+      "createdError": "Failed to issue work order.",
+      "fillRequiredFields": "Please provide a title and select a customer."
+    },
+    "createQuotation": {
+      "button": "New Quotation",
+      "title": "Create Customer Quotation",
+      "subtitle": "Draft a formal price proposal for maintenance, parts, or services",
+      "customerLabel": "Customer",
+      "lineItemsLabel": "Quotation Line Items",
+      "addItem": "Add Line Item",
+      "itemDescPlaceholder": "Item or service description…",
+      "qty": "Qty",
+      "price": "Unit Price",
+      "totalQuotation": "Total Amount",
+      "cancel": "Cancel",
+      "submit": "Create Quotation",
+      "createdSuccess": "Quotation created successfully.",
+      "createdError": "Failed to create quotation.",
+      "fillRequiredFields": "Please add at least one line item and select a customer."
+    }
+  },
+  "Portal": {
+    "portalBadge": "Customer Support & Service Portal",
+    "nav": {
+      "home": "Home",
+      "kb": "Knowledge Base",
+      "tickets": "My Tickets",
+      "submitTicket": "New Ticket"
+    },
+    "footer": {
+      "rights": "All rights reserved.",
+      "poweredBy": "Powered by Sanad Customer Service & Support Platform"
+    },
+    "hero": {
+      "badge": "Help & Support Center · {tenantName}",
+      "title": "How can we assist you today?",
+      "subtitle": "Search our knowledge base for instant answers or open a support ticket and our team will assist you.",
+      "searchPlaceholder": "Search by keywords, troubleshooting, or FAQ…",
+      "searchButton": "Search"
+    },
+    "quickActions": {
+      "submitTitle": "Open a New Ticket",
+      "submitDescription": "Encountering an issue or need technical assistance? Submit your request directly.",
+      "submitCta": "Submit Ticket",
+      "trackTitle": "Track My Existing Tickets",
+      "trackDescription": "Check the status of previous tickets and follow updates via your email.",
+      "trackCta": "Track Tickets",
+      "kbTitle": "Browse Knowledge Base",
+      "kbDescription": "User manuals, technical tutorials, and solutions for common questions.",
+      "kbCta": "Browse Articles"
+    },
+    "categoriesTitle": "Categories & Topics",
+    "categoriesSubtitle": "Explore help articles organized by category",
+    "viewAllCategories": "View all categories",
+    "articlesUnit": "articles",
+    "featuredTitle": "Featured & Popular Articles",
+    "featuredSubtitle": "Most read and helpful articles for our customers",
+    "viewAllArticles": "View all articles",
+    "featuredBadge": "Featured",
+    "readArticle": "Read Article",
+    "newTicket": {
+      "title": "Submit a New Support Ticket",
+      "subtitle": "Fill out the form below and our support team will review and respond according to our SLA.",
+      "home": "Home",
+      "nameLabel": "Your Full Name",
+      "namePlaceholder": "Jane Doe",
+      "emailLabel": "Email Address",
+      "phoneLabel": "Phone Number (optional)",
+      "priorityLabel": "Priority Level",
+      "priorities": {
+        "LOW": "Low (General inquiry)",
+        "MEDIUM": "Medium (General help request)",
+        "HIGH": "High (Issue impacting work)",
+        "URGENT": "Urgent (Complete service outage)"
+      },
+      "subjectLabel": "Subject / Issue Summary",
+      "subjectPlaceholder": "e.g., Unable to login to the client portal",
+      "descriptionLabel": "Detailed Description",
+      "descriptionPlaceholder": "Describe the steps that caused the issue and any error messages displayed…",
+      "slaGuaranteedNotice": "Your ticket is protected and scheduled according to the active SLA policy.",
+      "submitButton": "Submit Ticket Now",
+      "fillRequiredFields": "Please fill in all required fields.",
+      "submittedSuccess": "Your ticket has been submitted successfully with reference #{number}.",
+      "submitError": "Failed to submit ticket. Please try again later."
+    },
+    "ticketsLookup": {
+      "title": "Track Previous Support Tickets",
+      "subtitle": "Enter your verified email address to view all registered tickets and check their progress.",
+      "home": "Home",
+      "emailPlaceholder": "Enter your registered email address…",
+      "lookupButton": "Find My Tickets",
+      "resultsTitle": "Found {count} tickets associated with ({email})",
+      "emptyTitle": "No tickets found",
+      "emptyDescription": "No open or past tickets were found associated with this email address.",
+      "submitNewTicket": "Open a new support ticket",
+      "table": {
+        "ticket": "Ticket & Subject",
+        "status": "Status",
+        "created": "Submitted Date",
+        "action": "Action"
+      },
+      "statuses": {
+        "OPEN": "Open",
+        "IN_PROGRESS": "In Progress",
+        "PENDING_CUSTOMER": "Awaiting Your Reply",
+        "ESCALATED": "Escalated",
+        "RESOLVED": "Resolved",
+        "CLOSED": "Closed"
+      },
+      "viewConversation": "View Thread & Replies"
+    },
+    "ticketDetail": {
+      "home": "Home",
+      "tickets": "My Tickets",
+      "statuses": {
+        "OPEN": "Open",
+        "IN_PROGRESS": "In Progress",
+        "PENDING_CUSTOMER": "Awaiting Your Reply",
+        "ESCALATED": "Escalated",
+        "RESOLVED": "Resolved",
+        "CLOSED": "Closed"
+      },
+      "conversationThread": "Conversation & Replies",
+      "noRepliesYet": "No replies yet. Our support engineering team will respond shortly.",
+      "supportTeam": "Support Team",
+      "you": "You (Requester)",
+      "agentBadge": "Support Agent",
+      "replyPlaceholder": "Type your response or additional details for the support team here…",
+      "sendReply": "Send Reply",
+      "replySuccess": "Your reply was sent successfully.",
+      "replyError": "Failed to send reply. Please try again.",
+      "verificationTitle": "Verify Ticket Ownership",
+      "verificationDescription": "To safeguard your data privacy, please enter the email address used to create ticket #{number}.",
+      "emailVerificationPlaceholder": "Enter email to verify…",
+      "verifyButton": "Verify & View Ticket"
+    },
+    "kbDirectory": {
+      "home": "Home",
+      "title": "Knowledge Base & Guides",
+      "subtitle": "Discover verified technical solutions and guides for fast, reliable self-service",
+      "searchPlaceholder": "Search knowledge base…",
+      "allCategories": "All Categories",
+      "emptyTitle": "No articles found",
+      "emptyDescription": "No published articles currently match your search query.",
+      "featured": "Featured"
+    },
+    "articleDetail": {
+      "home": "Home",
+      "kbDirectory": "Knowledge Base",
+      "views": "views",
+      "authorBy": "By Support Team: {name}",
+      "helpBannerTitle": "Still need assistance?",
+      "helpBannerDescription": "If you did not find the answer you need, open a support ticket and one of our agents will take over.",
+      "submitTicketCta": "Open a Support Ticket"
+    }
+  },
+  "KnowledgeBase": {
+    "title": "Knowledge Base & Articles Management",
+    "subtitle": "Create and organize bilingual help guides to deflect common tickets and empower self-service",
+    "viewPublicKb": "View Public Portal",
+    "filterAll": "All",
+    "searchPlaceholder": "Search articles in Arabic or English…",
+    "metrics": {
+      "totalArticles": "Total Articles",
+      "published": "Published Articles",
+      "categories": "Categories",
+      "helpfulVotes": "Helpful Upvotes"
+    },
+    "emptyTitle": "No articles",
+    "emptyDescription": "No articles were found matching your current search criteria.",
+    "table": {
+      "article": "Article & Title",
+      "category": "Category",
+      "status": "Status",
+      "views": "Views",
+      "feedback": "Rating",
+      "author": "Author",
+      "date": "Date"
+    },
+    "statusLabel": "Publishing Status",
+    "statusUpdatedSuccess": "Article status updated successfully.",
+    "statusUpdateError": "Failed to update article status.",
+    "statuses": {
+      "PUBLISHED": "Published",
+      "DRAFT": "Draft",
+      "ARCHIVED": "Archived"
+    },
+    "createCategory": {
+      "button": "New Category",
+      "title": "Create Knowledge Base Category",
+      "subtitle": "Add a taxonomy category to group related support articles",
+      "nameArLabel": "Category Name (Arabic)",
+      "nameEnLabel": "Category Name (English)",
+      "descArLabel": "Description (Arabic, optional)",
+      "descEnLabel": "Description (English, optional)",
+      "cancel": "Cancel",
+      "submit": "Create Category",
+      "createdSuccess": "Category created successfully.",
+      "createdError": "Failed to create category.",
+      "fillRequiredFields": "Please provide category names in both Arabic and English."
+    },
+    "createArticle": {
+      "button": "New Article",
+      "title": "Compose Knowledge Base Article",
+      "subtitle": "Write a bilingual (Arabic / English) knowledge guide for customers and agents",
+      "categoryLabel": "Category",
+      "uncategorized": "Uncategorized (General)",
+      "statusLabel": "Initial Status",
+      "featuredLabel": "Set as Featured Article on Portal",
+      "titleArLabel": "Article Title (Arabic)",
+      "titleEnLabel": "Article Title (English)",
+      "contentArLabel": "Article Content (Arabic)",
+      "contentEnLabel": "Article Content (English)",
+      "statuses": {
+        "PUBLISHED": "Publish Immediately",
+        "DRAFT": "Save as Draft"
+      },
+      "cancel": "Cancel",
+      "submit": "Save Article",
+      "createdSuccess": "Article created successfully.",
+      "createdError": "Failed to create article.",
+      "fillRequiredFields": "Please fill in titles and content in both languages."
+    },
+    "feedback": {
+      "question": "Was this article helpful to you?",
+      "yes": "Yes, helpful",
+      "no": "No, it didn't help",
+      "commentPlaceholderHelpful": "What did you find most useful? (optional)",
+      "commentPlaceholderUnhelpful": "How can we improve this article or what was missing? (optional)",
+      "sendFeedback": "Submit Feedback",
+      "thankYou": "Thank you for sharing your feedback!",
+      "thankYouTitle": "Your feedback has been received",
+      "thankYouMessage": "Your input helps us continuously improve our documentation and better assist customers.",
+      "submitError": "Failed to submit feedback. Please try again."
+    }
+  },
+  "Analytics": {
+    "title": "Analytics & Performance Dashboard",
+    "subtitle": "Track support workload, SLA compliance, response velocity, and customer satisfaction in real time",
+    "ticketsUnit": "tickets",
+    "minutesUnit": "min",
+    "hoursUnit": "hrs",
+    "workOrdersUnit": "work orders",
+    "slaGuaranteedLabel": "Resolution SLA Rate",
+    "responseSpeedLabel": "Avg First Response",
+    "resolutionSpeedLabel": "Avg Resolution Time",
+    "customerSatisfactionLabel": "CSAT Satisfaction Score",
+    "kpis": {
+      "resolutionRate": "Ticket Resolution Rate",
+      "slaCompliance": "SLA Compliance",
+      "avgFirstResponse": "Avg First Response",
+      "avgResolutionTime": "Avg Resolution Time",
+      "csatScore": "Customer Satisfaction (CSAT)",
+      "pipelineValue": "Operations Pipeline"
+    },
+    "trend": {
+      "title": "14-Day Ticket Activity Trend",
+      "subtitle": "Daily comparison between newly submitted and resolved tickets",
+      "created": "New Tickets",
+      "resolved": "Resolved Tickets"
+    },
+    "priorityBreakdown": {
+      "title": "Tickets by Priority"
+    },
+    "channelBreakdown": {
+      "title": "Tickets by Ingestion Channel"
+    },
+    "departmentWorkload": {
+      "title": "Workload by Department"
+    },
+    "priorities": {
+      "URGENT": "Urgent",
+      "HIGH": "High",
+      "MEDIUM": "Medium",
+      "LOW": "Low"
+    },
+    "channels": {
+      "PORTAL": "Client Portal",
+      "EMAIL": "Email Ingestion",
+      "PHONE": "Phone Support",
+      "API": "REST API",
+      "CHAT": "Live Chat",
+      "WHATSAPP": "WhatsApp"
+    }
+  },
+  "Notifications": {
+    "title": "Notifications",
+    "unread": "unread",
+    "empty": "No new notifications right now",
+    "markAllRead": "Mark all as read",
+    "view": "View Link"
+  },
+  "CommandPalette": {
+    "triggerPlaceholder": "Quick search…",
+    "inputPlaceholder": "Type to search tickets, customers, articles, and quick commands…",
+    "noResults": "No matching results found",
+    "groupResults": "Matching Results",
+    "groupNavigation": "Navigation",
+    "groupActions": "Quick Actions",
+    "hintNavigate": "Use arrow keys ⇅ to navigate and Enter to select",
+    "hintEsc": "Press ESC to close",
+    "nav": {
+      "dashboard": "Dashboard",
+      "tickets": "Tickets & Helpdesk",
+      "crm": "Customers (CRM)",
+      "kb": "Knowledge Base",
+      "operations": "Operations & Assets",
+      "analytics": "Analytics & Reports",
+      "settings": "Settings",
+      "billing": "Billing & Subscription"
+    },
+    "actions": {
+      "newTicket": "Create New Ticket",
+      "newCustomer": "Add New Customer"
+    }
+  },
+  "AgentChat": {
+    "pageTitle": "Live Chat & Visitor Inbox",
+    "pageSubtitle": "Receive customer chats from the portal, respond in real time, or convert chats to support tickets",
+    "inboxTitle": "Chat Queue",
+    "noActiveSessions": "No active chat sessions",
+    "statusWaiting": "Waiting",
+    "statusOpen": "Open",
+    "statusAssigned": "Assigned",
+    "statusClosed": "Closed",
+    "anonymousVisitor": "Anonymous visitor",
+    "claimChat": "Claim Chat",
+    "convertToTicket": "Convert to Ticket",
+    "endChat": "End Chat",
+    "you": "You (Support Agent)",
+    "typeMessagePlaceholder": "Type your reply to customer here…",
+    "sessionIsClosed": "This session has been closed.",
+    "noSelectedSessionTitle": "Select a conversation from the sidebar",
+    "noSelectedSessionDescription": "Claim pending chats and answer customer questions in real time.",
+    "claimedSuccess": "Chat claimed successfully.",
+    "closedSuccess": "Chat closed.",
+    "convertedSuccess": "Ticket #{number} created successfully."
+  },
+  "ChatWidget": {
+    "openChat": "Support Chat",
+    "chatWithUs": "Chat with us",
+    "onlineSupport": "Online for Support",
+    "introNotice": "Chat directly with our support team for quick assistance.",
+    "nameLabel": "Your Full Name",
+    "namePlaceholder": "Jane Doe",
+    "emailLabel": "Email Address",
+    "subjectLabel": "Subject (optional)",
+    "subjectPlaceholder": "Inquiry about service",
+    "initialMessageLabel": "Your Message",
+    "initialMessagePlaceholder": "How can we assist you today?",
+    "startChatButton": "Start Chat",
+    "you": "You",
+    "agent": "Support Team",
+    "replyPlaceholder": "Type your message here…"
+  },
+  "CannedResponses": {
+    "triggerButton": "Canned Replies",
+    "title": "Saved Canned Replies",
+    "newShortcut": "New Reply",
+    "empty": "No saved canned replies",
+    "createTitle": "Create New Canned Reply",
+    "shortcutLabel": "Shortcut Keyword (e.g., welcome)",
+    "nameLabel": "Reply Title",
+    "bodyLabel": "Saved Reply Text",
+    "bodyPlaceholder": "Write your canned reply message here…",
+    "cancel": "Cancel",
+    "save": "Save Reply",
+    "createdSuccess": "Canned reply saved successfully.",
+    "createdError": "Failed to save canned reply."
+  },
+  "Leaderboard": {
+    "title": "Support Team Performance Leaderboard",
+    "subtitle": "Agent rankings, resolution velocity, and customer satisfaction",
+    "activeAgents": "active agents",
+    "rank": "Rank",
+    "agent": "Support Agent",
+    "resolved": "Resolved",
+    "resolutionRate": "Resolution %",
+    "avgResponse": "First Response",
+    "csat": "CSAT",
+    "points": "Score",
+    "pts": "pts"
+  },
+  "Errors": {
+    "notFoundTitle": "Page not found",
+    "notFoundDescription": "The link may have changed, or you may not have access to this workspace.",
+    "backHome": "Back to home",
+    "errorTitle": "Something went wrong",
+    "errorDescription": "This page could not be loaded. You can try again.",
+    "retry": "Try again"
+  }
+}
